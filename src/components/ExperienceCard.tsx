@@ -54,9 +54,15 @@ export default function ExperienceCard({
             hover:scale-[1.02] hover:shadow-lg
           `}
         >
-          <div className="min-w-[120px] text-sm font-medium text-gray-600 dark:text-gray-400">
-            {exp.period}
+          <div className="min-w-[120px] text-sm font-medium text-gray-600 dark:text-gray-400 uppercase text-xs">
+            {exp.period.split(" - ")[0]}
+            {exp.period.includes("-") && (
+              <span className="text-gray-400 dark:text-gray-500"> - </span>
+            )}
+            <br />
+            {exp.period.split(" - ")[1]}
           </div>
+
           <div className="flex-1 w-full">
             <div className="flex items-start justify-between gap-2">
               <h3
@@ -64,10 +70,9 @@ export default function ExperienceCard({
     text-sm md:text-base font-normal
     text-indigo-600 dark:text-yellow-200
     transition-all duration-300
-    bg-clip-text text-transparent
-    bg-gradient-to-r from-indigo-600 to-pink-500
-    group-hover:from-purple-600 group-hover:to-indigo-500
-    dark:group-hover:from-yellow-300 dark:group-hover:to-pink-200
+    group-hover:bg-clip-text group-hover:text-transparent
+    group-hover:bg-gradient-to-r from-indigo-600 to-pink-500
+    dark:group-hover:from-yellow-300 dark:group-hover:to-pink-500
   `}
               >
                 {exp.title}
@@ -79,7 +84,7 @@ export default function ExperienceCard({
               {exp.website && (
                 <FiArrowUpRight
                   className="text-gray-400 dark:text-gray-500 group-hover:translate-x-3 group-hover:-translate-y-3 transition-all duration-200 group-hover:text-indigo-600 dark:group-hover:text-yellow-200"
-                  size={18}
+                  size={20}
                 />
               )}
             </div>

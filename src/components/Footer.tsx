@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="text-center py-6 text-sm text-gray-400 dark:text-gray-600">
+    <footer className="text-center md:text-start py-6 text-sm text-gray-400 dark:text-gray-600">
       Réalisé avec{" "}
       <a 
         href="https://nextjs.org"
@@ -18,7 +18,17 @@ export default function Footer() {
         className="text-indigo-600 dark:text-yellow-200 hover:underline"
       >
         Tailwind CSS
-      </a>{" "}
+      </a>.{" "}
+      Déployé sur{" "}
+      <a
+        href="https://vercel.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-indigo-600 dark:text-yellow-200 hover:underline"
+      >
+        Vercel
+      </a>.
+      <br />
       <br />
       © {new Date().getFullYear()} Rafael Tavares. Tous droits réservés.
     </footer>

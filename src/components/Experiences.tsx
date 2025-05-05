@@ -26,7 +26,7 @@ const experiences: Experience[] = [
   {
     title: "Développeur Full-Stack (stage)",
     company: "LFP Ravalement",
-    period: "2021",
+    period: "juin 2021 - août 2021",
     location: "Paris, France",
     description: `Création d'un site vitrine et d'un système de facturation personnalisé. Déploiement du site, configuration de l'hébergement et optimisation du référencement pour améliorer la visibilité de l'entreprise.`,
     tech: ["node", "express", "vue", "postgresql", "tailwind"],
@@ -35,7 +35,7 @@ const experiences: Experience[] = [
   {
     title: "Développeur Full-Stack (stage)",
     company: "Sport Management System",
-    period: "2020",
+    period: "juin 2020 - août 2020",
     location: "Paris, France",
     description: `Amélioration d'un planning de gestion de coachs sportifs. Développement de nouvelles fonctionnalités en autonomie pour répondre à des besoins utilisateurs spécifiques.`,
     tech: ["laravel", "vue", "vuetify"],
