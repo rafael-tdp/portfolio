@@ -13,7 +13,6 @@ export default function About() {
     "Next.js",
   ];
 
-  // Animation principale du bloc
   const containerVariants = {
     hidden: { opacity: 0, y: 40 },
     visible: {
@@ -26,7 +25,6 @@ export default function About() {
     },
   };
 
-  // Animation des <strong>
   const strongVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: {
@@ -36,7 +34,6 @@ export default function About() {
     },
   };
 
-  // Animation des items de la liste
   const listItemVariants = {
     hidden: { opacity: 0, x: -10 },
     visible: (i: number) => ({
@@ -50,7 +47,6 @@ export default function About() {
     }),
   };
 
-  // Fonction helper pour les mots en gras
   const Strong = ({ children }: { children: React.ReactNode }) => (
     <motion.strong
       variants={strongVariants}
@@ -73,31 +69,31 @@ export default function About() {
       viewport={{ once: false, amount: 0.2 }}
     >
       <p className="text-sm sm:text-md text-slate-700 dark:text-slate-400 leading-relaxed">
-        Bonjour ! Je m'appelle <Strong>Rafael Tavares De Pinho</Strong>, et je
+        Bonjour ! Je m&apos;appelle <Strong>Rafael Tavares De Pinho</Strong>, et je
         suis un <Strong>développeur full-stack</Strong> passionné par la
-        création d'expériences web à la fois <Strong>intuitives</Strong>,{" "}
+        création d&apos;expériences web à la fois <Strong>intuitives</Strong>,{" "}
         <Strong>accessibles</Strong> et <Strong>performantes</Strong>.
         <br />
         <br />
-        J'ai débuté mon parcours en tant que{" "}
+        J&apos;ai débuté mon parcours en tant que{" "}
         <Strong>développeur back-end</Strong> chez <Strong>Ownest</Strong>, où
-        j'ai travaillé sur des APIs robustes. Ce poste m'a permis de participer
-        à la stabilité et à l'évolution d'un projet en production. En parallèle
-        de cette expérience professionnelle, j'ai pu développer ma sensibilité
+        j&apos;ai travaillé sur des APIs robustes. Ce poste m&apos;a permis de participer
+        à la stabilité et à l&apos;évolution d&apos;un projet en production. En parallèle
+        de cette expérience professionnelle, j&apos;ai pu développer ma sensibilité
         pour le <Strong>front-end</Strong> grâce à des projets étudiants ou
-        personnels. Je m'attache toujours à produire des interfaces soignées,
+        personnels. Je m&apos;attache toujours à produire des interfaces soignées,
         cohérentes et accessibles.
         <br />
         <br />
-        J'aime particulièrement travailler sur des applications qui demandent
-        une réelle attention à la fois à l'<Strong>ergonomie</Strong> et à l'
-        <Strong>architecture technique</Strong>. Qu'il s'agisse de design
+        J&apos;aime particulièrement travailler sur des applications qui demandent
+        une réelle attention à la fois à l&apos;<Strong>ergonomie</Strong> et à l&apos;
+        <Strong>architecture technique</Strong>. Qu&apos;il s&apos;agisse de design
         systems ou de logique métier complexe, je prends plaisir à construire
         des solutions durables et bien pensées.
         <br />
         <br />
         Je suis également passionné par les{" "}
-        <Strong>technologies JavaScript</Strong>, que j'utilise au quotidien à
+        <Strong>technologies JavaScript</Strong>, que j&apos;utilise au quotidien à
         travers des frameworks et bibliothèques comme :
         <br />
       </p>
