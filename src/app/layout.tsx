@@ -24,8 +24,8 @@ export default function RootLayout({
       <body
         className={`overflow-y-scroll no-scrollbar bg-slate-50 text-slate-700 dark:bg-slate-950 dark:text-slate-400 transition-colors duration-200 ${inter.className} max-w-screen-xl mx-auto`}
       >
-        <MouseAura />
-        <ThemeProvider attribute="data-theme" enableSystem>
+        <ThemeProvider attribute="data-theme" defaultTheme="dark">
+          <MouseAura />
           {children}
         </ThemeProvider>
       </body>
