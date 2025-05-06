@@ -82,7 +82,7 @@ export default function ProjectsSection({
           title={title}
           description={imageDescription}
           image={image}
-          href="#"
+          href={href}
           bgGradient={bgGradient}
           textColor={textColor}
           shadowColor={shadowColor}

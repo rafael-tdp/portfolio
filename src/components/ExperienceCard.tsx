@@ -90,11 +90,11 @@ export default function ExperienceCard({
               )}
             </div>
             {exp.location && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-300">
                 {exp.location}
               </p>
             )}
-            <p className="mt-2 text-gray-700 dark:text-gray-300 whitespace-pre-line text-sm">
+            <p className="mt-2 text-sm">
               {exp.description}
             </p>
 
