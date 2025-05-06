@@ -21,7 +21,8 @@ export default function Projects() {
             href={p.href}
             gradient={p.gradient}
             bgGradient={p.bgGradient}
-            textColor={p.textColor}
+            accentColor={p.accentColor}
+            darkAccentColor={p.darkAccentColor}
             shadowColor={p.shadowColor}
             key={i}
           />

@@ -6,7 +6,8 @@ const projects = [
     gradient: "from-emerald-900 to-emerald-500",
     bgGradient:
       "linear-gradient(188.62deg, rgb(8, 57, 38) 49.9%, rgb(5, 150, 105) 81.7%, rgb(52, 211, 153) 93.88%, rgb(249, 215, 147) 113.5%)",
-    textColor: "text-emerald-300",
+    accentColor: "text-emerald-500",
+    darkAccentColor: "text-emerald-300",
     shadowColor: "#059669",
     tech: ["react", "tailwind", "apiplatform", "php", "postgresql", "docker"],
     details: [
@@ -24,7 +25,8 @@ const projects = [
       "Une application de recherche intelligente de recettes de cuisine.",
     image: "/img/projects/cuisine-connect.png",
     gradient: "from-rose-700 to-rose-300",
-    textColor: "text-rose-300",
+    accentColor: "text-rose-500",
+    darkAccentColor: "text-rose-300",
     shadowColor: "#DB2777",
     tech: ["react", "tailwind", "node", "express", "docker", "openai"],
     details: [
@@ -45,7 +47,8 @@ const projects = [
     gradient: "from-indigo-900 to-indigo-300",
     bgGradient:
       "linear-gradient(188.62deg, rgb(9, 0, 81) 49.9%, rgb(96, 59, 246) 81.7%, rgb(107, 172, 252) 93.88%, rgb(142, 229, 255) 113.5%)",
-    textColor: "text-indigo-300",
+    accentColor: "text-indigo-500",
+    darkAccentColor: "text-indigo-300",
     shadowColor: "#A855F7",
     tech: ["react", "tailwind", "node", "express", "socketio", "mongodb"],
     details: [

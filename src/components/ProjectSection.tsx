@@ -2,6 +2,8 @@
 
 import { PiStarFourBold } from "react-icons/pi";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import ProjectCard from "./ProjectCard";
 import TechnologyBadge from "./TechnologyBadge";
 
@@ -14,7 +16,8 @@ export default function ProjectsSection({
   href,
   tech = [],
   bgGradient = "linear-gradient(188.62deg, #6b0d33 49.9%, #db2777 81.7%, #f472b6 93.88%, #f9d793 113.5%)",
-  textColor = "text-pink-300",
+  accentColor = "text-pink-300",
+  darkAccentColor = "text-pink-500",
   shadowColor = "#DB2777",
   gradient = "linear-gradient(90deg, #6b0d33 0%, #db2777 100%)",
 }: {
@@ -26,12 +29,23 @@ export default function ProjectsSection({
   href?: string;
   tech?: string[];
   bgGradient?: string;
-  textColor?: string;
+  accentColor?: string;
+  darkAccentColor?: string;
   shadowColor?: string;
   gradient?: string;
 }) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDarkMode = mounted && resolvedTheme === "dark";
+  const textAccentColor = isDarkMode ? darkAccentColor : accentColor;
+
   return (
-    <section id="projects" className="relative w-full py-12">
+    <section id="projects" className="relative w-full py-8 md:py-12">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -43,20 +57,26 @@ export default function ProjectsSection({
             aria-hidden="true"
             className={`my-4 mr-4 h-1 min-w-6 rounded-full ${
               gradient ? `bg-gradient-to-r ${gradient}` : `bg-pink-300`
-            }`}
+            } hidden md:flex`}
           ></div>
+
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-3">
+              <div
+                aria-hidden="true"
+                className={`flex md:hidden my-4 mr-4 h-1 min-w-6 rounded-full ${
+                  gradient ? `bg-gradient-to-r ${gradient}` : `bg-pink-300`
+                }`}
+              ></div>
+
               <h3 className="text-xl md:text-2xl font-semibold">{title}</h3>
             </div>
-            <p className="my-2 text-sm md:text-sm">
-              {description}
-            </p>
+            <p className="my-2 text-sm md:text-sm">{description}</p>
             <ul className="mt-2 flex flex-col gap-y-2 text-sm md:text-sm">
               {details?.map((detail, index) => (
                 <li key={index} className="flex items-center">
                   <PiStarFourBold
-                    className={`mt-1 mr-2 h-3 w-3 shrink-0 ${textColor}`}
+                    className={`mt-1 mr-2 h-3 w-3 shrink-0 ${textAccentColor}`}
                   />
                   {detail}
                 </li>
@@ -64,7 +84,14 @@ export default function ProjectsSection({
             </ul>
             <div className="mt-10 flex flex-wrap gap-3 text-sm">
               {tech.map((techId) => (
-                <TechnologyBadge key={techId} id={techId} showIcon={true} bgColor="bg-transparent" textColor={`${textColor}`} />
+                <TechnologyBadge
+                  key={techId}
+                  id={techId}
+                  showIcon={true}
+                  bgColor="bg-transparent"
+                  accentColor={accentColor}
+                  darkAccentColor={darkAccentColor}
+                />
               ))}
             </div>
           </div>
@@ -84,7 +111,7 @@ export default function ProjectsSection({
           image={image}
           href={href}
           bgGradient={bgGradient}
-          textColor={textColor}
+          accentColor={accentColor}
           shadowColor={shadowColor}
         />
       </motion.div>

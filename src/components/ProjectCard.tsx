@@ -8,7 +8,7 @@ export default function ProjectCard({
   image = null,
   href,
   bgGradient = "linear-gradient(188.62deg, #6b0d33 49.9%, #db2777 81.7%, #f472b6 93.88%, #f9d793 113.5%)",
-  textColor = "text-pink-300",
+  accentColor = "text-pink-300",
   shadowColor = "#DB2777",
 }: {
   title: string;
@@ -16,7 +16,7 @@ export default function ProjectCard({
   image: string | null;
   href?: string;
   bgGradient?: string;
-  textColor?: string;
+  accentColor?: string;
   shadowColor?: string;
 }) {
   return (
@@ -25,7 +25,7 @@ export default function ProjectCard({
         <Link
           href={href || "#"}
           target="_blank"
-          className="relative cursor-pointer overflow-hidden rounded-xl border border-white/15 p-1 shadow-lg md:shadow-2xl h-[250px] md:h-[450px] lg:rounded-3xl lg:p-1.5 group"
+          className="relative cursor-pointer overflow-hidden rounded-xl border border-gray-400/15 bg-slate-950 dark:bg-transparent dark:border-white/15 p-1 shadow-lg md:shadow-2xl h-[250px] md:h-[450px] lg:rounded-3xl lg:p-1.5 group"
         >
           <div
             className="absolute inset-x-0 top-0 h-px"
@@ -56,13 +56,13 @@ export default function ProjectCard({
 
             <div className="w-full flex-row items-start justify-between px-6 md:px-12 py-4 md:py-8 flex text-pink-300 z-10 group-hover:scale-[1.05] transition-all duration-300">
               <h3
-                className={`max-w-[90%] text-sm sm:text-lg md:text-lg lg:text-xl ${textColor}`}
+                className={`max-w-[90%] text-sm sm:text-lg md:text-lg lg:text-xl ${accentColor}`}
               >
                 {description}
               </h3>
 
               <FiArrowUpRight
-                className={`transition-all duration-200 group-hover:translate-x-3 group-hover:-translate-y-3 ${textColor}`}
+                className={`transition-all duration-200 group-hover:translate-x-3 group-hover:-translate-y-3 ${accentColor}`}
                 size={20}
               />
             </div>

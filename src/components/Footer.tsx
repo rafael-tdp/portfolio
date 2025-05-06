@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="text-center md:text-start py-6 text-sm text-gray-400 dark:text-gray-600">
+    <footer className="text-center py-6 text-sm text-gray-400 dark:text-gray-600">
       Réalisé avec{" "}
       <a 
         href="https://nextjs.org"
