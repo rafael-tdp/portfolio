@@ -9,7 +9,7 @@ type Experience = {
   location: string;
   description: string;
   tech: string[];
-  website?: string;
+  href?: string;
 };
 
 export default function ExperienceCard({
@@ -25,7 +25,7 @@ export default function ExperienceCard({
   onHover: () => void;
   onLeave: () => void;
 }) {
-  const Wrapper = exp.website ? "a" : "div";
+  const Wrapper = exp.href ? "a" : "div";
 
   return (
     <div
@@ -36,11 +36,11 @@ export default function ExperienceCard({
       onMouseLeave={onLeave}
     >
       <Wrapper
-        href={exp.website}
+        href={exp.href}
         target="_blank"
         rel="noopener noreferrer"
         className={`block group focus:outline-none ${
-          exp.website ? "cursor-pointer" : ""
+          exp.href ? "cursor-pointer" : ""
         }`}
       >
         <AnimatedTiltCard
@@ -77,30 +77,28 @@ export default function ExperienceCard({
   `}
               >
                 {exp.title}
-                <span className="text-gray-800 dark:text-gray-200 font-normal">
-                  {" "}
-                  · {exp.company}
-                </span>
               </h3>
-              {exp.website && (
+              {exp.href && (
                 <FiArrowUpRight
                   className="text-gray-400 dark:text-gray-500 group-hover:translate-x-3 group-hover:-translate-y-3 transition-all duration-200 group-hover:text-indigo-600 dark:group-hover:text-yellow-200"
                   size={20}
                 />
               )}
             </div>
+
             {exp.location && (
               <p className="text-sm text-gray-500 dark:text-gray-300">
+                <span className="text-gray-800 dark:text-gray-200 font-semibold">
+                  {exp.company} ·{" "}
+                </span>
                 {exp.location}
               </p>
             )}
-            <p className="mt-2 text-sm">
-              {exp.description}
-            </p>
+            <p className="mt-2 text-sm">{exp.description}</p>
 
             <div className="mt-3 flex flex-wrap gap-3">
               {exp.tech.map((techId, index) => (
-                <TechnologyBadge key={index} id={techId} />
+                <TechnologyBadge key={index} id={techId} showIcon={true} />
               ))}
             </div>
           </div>

@@ -13,10 +13,10 @@ export default function TechnologyBadge({
   showIcon?: boolean;
 }) {
   const tech = technologies.find((t) => t.id === id);
-  if (!tech) return null;
-
-  const Icon = iconMap[tech.icon];
   const [isHovered, setIsHovered] = useState(false);
+
+  if (!tech) return null;
+  const Icon = iconMap[tech.icon];
 
   return (
     <span
