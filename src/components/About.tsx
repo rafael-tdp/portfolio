@@ -50,8 +50,8 @@ export default function About() {
   const Strong = ({ children }: { children: React.ReactNode }) => (
     <motion.strong
       variants={strongVariants}
-      initial="hidden"
-      whileInView="visible"
+      initial="opacity-0"
+      whileInView="opacity-100"
       viewport={{ once: false, amount: 0.8 }}
       className="font-semibold text-indigo-600 dark:text-yellow-200"
     >

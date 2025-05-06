@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className={`overflow-y-scroll no-scrollbar bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-400 transition-colors duration-200 ${inter.className} max-w-screen-xl mx-auto`}
+        className={`overflow-y-scroll no-scrollbar bg-slate-50 text-slate-700 dark:bg-slate-950 dark:text-slate-400 transition-colors duration-200 ${inter.className} max-w-screen-xl mx-auto`}
       >
         <MouseAura />
         <ThemeProvider attribute="data-theme" enableSystem>

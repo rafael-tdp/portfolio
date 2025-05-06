@@ -1,39 +1,29 @@
 "use client";
 
-import { ProjectCard } from "./ProjectCard";
-
-const projects: any[] = [
-  // {
-  //   title: "Blog Next.js",
-  //   desc: "Un blog moderne avec Markdown",
-  //   tech: "Next.js, Tailwind",
-  // },
-  // {
-  //   title: "API Node.js",
-  //   desc: "API REST sécurisée",
-  //   tech: "Node.js, Express",
-  // },
-  // { title: "Jeu 3D", desc: "Expérience WebGL en 3D", tech: "Three.js" },
-];
+import ProjectsSection from "./ProjectSection";
+import projects from "@/lib/projects";
 
 export default function Projects() {
   return (
     <section id="projects" className="py-16 px-4 max-w-5xl mx-auto">
-      <h2 className="text-md font-medium mb-12 text-gray-600 dark:text-gray-400 uppercase tracking-widest">
-          # Projets récents
-        </h2>
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* to come */}
-        <p className="text-sm md:text-md text-slate-500 dark:text-gray-400 md:mb-0 mb-8 col-span-3 mb-12">
-          Ajout prochainement de mes projets récents...
-        </p>
+      <h2 className="text-md font-medium mb-4 text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+        # Projets récents
+      </h2>
+      <div className="flex flex-col gap-6">
         {projects.map((p, i) => (
-          <ProjectCard
-            key={i}
+          <ProjectsSection
             title={p.title}
-            desc={p.desc}
+            description={p.description}
+            details={p.details}
+            image={p.image}
+            imageDescription={p.imageDescription}
             tech={p.tech}
-            delay={i * 0.1}
+            href={p.href}
+            gradient={p.gradient}
+            bgGradient={p.bgGradient}
+            textColor={p.textColor}
+            shadowColor={p.shadowColor}
+            key={i}
           />
         ))}
       </div>

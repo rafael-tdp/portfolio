@@ -16,7 +16,7 @@ export default function MouseAura() {
 
   return (
     <div
-      className="pointer-events-none fixed z-50 w-0 md:w-96 h-96 rounded-full bg-indigo-500/20 dark:bg-indigo-500/20 blur-3xl transition-transform duration-50 ease-in-out"
+      className="pointer-events-none fixed z-20 w-0 md:w-96 h-96 rounded-full bg-indigo-500/20 dark:bg-indigo-500/20 blur-3xl transition-transform duration-50 ease-in-out"
       style={{
         left: 0,
         top: 0,

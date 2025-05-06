@@ -1,20 +1,36 @@
 "use client";
 
 import { Typewriter } from "react-simple-typewriter";
+import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <div>
-      <a
+    <div className="text-center md:text-left">
+      <motion.a
         href="#"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0 }}
         className="text-3xl md:text-5xl font-bold mb-4 tracking-tight dark:text-gray-100 block"
       >
         Rafael Tavares De Pinho
-      </a>
-      <p className="text-xl md:text-2xl tracking-tight font-medium text-slate-600 dark:text-gray-300 mb-4">
+      </motion.a>
+
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="text-xl md:text-2xl tracking-tight font-medium text-slate-600 dark:text-gray-300 mb-4"
+      >
         Développeur Full-Stack
-      </p>
-      <p className="text-sm md:text-md mt-2 text-slate-500 dark:text-gray-400 md:mb-0 mb-8">
+      </motion.p>
+
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="text-sm md:text-md mt-2 text-slate-500 dark:text-gray-400 md:mb-0 mb-8"
+      >
         <Typewriter
           words={[
             "Je conçois des applications web modernes",
@@ -29,7 +45,7 @@ export default function Hero() {
           deleteSpeed={30}
           delaySpeed={1500}
         />
-      </p>
+      </motion.p>
     </div>
   );
 }

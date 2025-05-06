@@ -46,7 +46,7 @@ export default function ExperienceCard({
         <AnimatedTiltCard
           delay={i * 0.1}
           className={`
-            flex flex-col md:flex-row items-start gap-4 rounded-lg p-6
+            flex flex-col md:flex-row items-start gap-4 rounded-lg py-6 px-0 md:px-6 z-30
             border border-transparent
             transition-all duration-300 ease-out
             hover:bg-gray-50 dark:hover:bg-gray-800/30
@@ -59,7 +59,7 @@ export default function ExperienceCard({
             {exp.period.includes("-") && (
               <span className="text-gray-400 dark:text-gray-500"> - </span>
             )}
-            <br />
+            <br className="hidden md:block" />
             {exp.period.split(" - ")[1]}
           </div>
 
@@ -68,11 +68,12 @@ export default function ExperienceCard({
               <h3
                 className={`
     text-sm md:text-base font-normal
-    text-indigo-600 dark:text-yellow-200
-    transition-all duration-300
-    group-hover:bg-clip-text group-hover:text-transparent
-    group-hover:bg-gradient-to-r from-indigo-600 to-pink-500
-    dark:group-hover:from-yellow-300 dark:group-hover:to-pink-500
+    bg-clip-text text-transparent
+    transition-all duration-500 ease-in-out
+    bg-gradient-to-r from-indigo-600 to-pink-500
+    dark:from-yellow-300 dark:to-pink-500
+    bg-[length:200%_100%] bg-left
+    group-hover:bg-right
   `}
               >
                 {exp.title}

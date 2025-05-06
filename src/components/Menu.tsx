@@ -35,7 +35,7 @@ export default function Menu() {
 
   return (
     <motion.nav
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="hidden md:flex flex-col gap-4 items-start py-12 mt-12"

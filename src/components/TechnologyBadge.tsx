@@ -1,14 +1,31 @@
 import { technologies, iconMap } from "@/lib/technologies";
 
-export default function TechnologyBadge({ id }: { id: string }) {
+export default function TechnologyBadge({
+  id,
+  bgColor = "bg-indigo-200/50 dark:bg-indigo-100/10",
+  textColor = "text-indigo-700 dark:text-indigo-400",
+  showIcon = false,
+}: {
+  id: string;
+  bgColor?: string;
+  textColor?: string;
+  showIcon?: boolean;
+}) {
   const tech = technologies.find((t) => t.id === id);
   if (!tech) return null;
 
   const Icon = iconMap[tech.icon];
 
   return (
-    <span className="flex items-center gap-1 text-xs text-indigo-700 dark:text-indigo-400 bg-indigo-200/50 dark:bg-indigo-100/10 px-2 py-1 rounded shadow-sm font-medium transition-all duration-300 ease-out hover:bg-indigo-300/70 dark:hover:bg-indigo-100/20 hover:scale-[1.02]">
-      {Icon && <Icon className="hidden w-4 h-4" />} 
+    <span
+      className={`relative overflow-hidden group flex items-center gap-1 text-xs ${textColor} ${bgColor} px-2 py-1 rounded-xl dark:shadow-sm font-medium transition-all duration-300 ease-out border border-indigo-300/50 dark:border-indigo-100/20 z-30`}
+    >
+      <span className="absolute inset-0 pointer-events-none before:absolute before:inset-y-0 before:left-[-75%] before:w-1/3 before:rotate-12 before:bg-white/40 before:blur-sm before:transition-transform before:duration-300 group-hover:before:translate-x-[250%]" />
+      {Icon && showIcon && (
+        <Icon
+          className={`h-4 w-4 ${textColor}`}
+        />
+      )}
       {tech.name}
     </span>
   );
