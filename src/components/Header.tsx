@@ -7,7 +7,7 @@ export default function Header() {
     <header className="flex flex-col md:h-screen lg:py-24 px-4 sm:px-8 pt-12 md:pt-0">
       <Hero />
       <Menu />
-      <div className="mt-auto hidden md:flex">
+      <div className="mt-auto">
         <Socials />
       </div>
     </header>

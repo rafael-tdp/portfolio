@@ -14,7 +14,7 @@ export default function Experiences() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-md font-medium mb-12 text-gray-600 dark:text-gray-400 uppercase tracking-widest"
+        className="text-md font-medium mb-6 md:mb-12 text-gray-600 dark:text-gray-400 uppercase tracking-widest"
       >
         # Expériences
       </motion.h2>

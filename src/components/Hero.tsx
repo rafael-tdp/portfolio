@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <div className="text-center md:text-left">
+    <div className="text-left">
       <motion.a
         href="#"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0 }}
-        className="text-3xl md:text-5xl font-bold mb-4 tracking-tight dark:text-gray-100 block"
+        className="text-3xl md:text-5xl font-semibold md:font-bold mb-4 tracking-tight dark:text-gray-100 block"
       >
         Rafael Tavares De Pinho
       </motion.a>
@@ -20,7 +20,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="text-xl md:text-2xl tracking-tight font-medium text-slate-600 dark:text-gray-300 mb-4"
+        className="text-lg md:text-2xl tracking-tight font-medium text-slate-600 dark:text-gray-300 mb-4 md:bg-transparent bg-indigo-300 dark:bg-indigo-800 py-1 md:py-0 inline-block md:block"
       >
         Développeur Full-Stack
       </motion.p>
@@ -29,7 +29,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="text-sm md:text-md mt-2 text-slate-500 dark:text-gray-400 md:mb-0 mb-8"
+        className="text-sm md:text-md mt-2 text-slate-500 dark:text-gray-400 mb-8 md:mb-0"
       >
         <Typewriter
           words={[
