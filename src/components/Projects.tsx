@@ -1,16 +1,21 @@
 "use client";
 
-import { FaChevronRight } from "react-icons/fa";
 import ProjectsSection from "./ProjectSection";
 import projects from "@/lib/projects";
 import { FiGithub } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 export default function Projects() {
   return (
     <section id="projects" className="py-16 px-4 max-w-5xl mx-auto">
-      <h2 className="text-md font-medium mb-4 text-gray-600 dark:text-gray-400 uppercase tracking-widest">
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="text-md font-medium mb-12 text-gray-600 dark:text-gray-400 uppercase tracking-widest"
+      >
         # Projets récents
-      </h2>
+      </motion.h2>
       <div className="flex flex-col gap-6">
         {projects.map((p, i) => (
           <ProjectsSection
