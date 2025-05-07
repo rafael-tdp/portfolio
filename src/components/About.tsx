@@ -52,7 +52,7 @@ export default function About() {
       variants={strongVariants}
       initial="opacity-0"
       whileInView="opacity-100"
-      viewport={{ once: false, amount: 0.8 }}
+      viewport={{ once: false }}
       className="font-semibold text-indigo-600 dark:text-yellow-200"
     >
       {children}
@@ -66,7 +66,7 @@ export default function About() {
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
+      viewport={{ once: false }}
     >
       <p className="text-sm sm:text-md text-slate-700 dark:text-slate-400 leading-relaxed">
         Bonjour ! Je m&apos;appelle <Strong>Rafael Tavares De Pinho</Strong>, et je

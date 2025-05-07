@@ -38,7 +38,7 @@ export default function Menu() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="hidden md:flex flex-col gap-4 items-start py-12 mt-12"
+      className="hidden md:flex flex-col gap-7 items-start py-12 mt-12 relative"
     >
       {menuItems.map(({ label, href }, index) => (
         <motion.div
@@ -49,20 +49,20 @@ export default function Menu() {
         >
           <Link
             href={href}
-            className={`text-xs font-medium transition-all group relative uppercase ${
+            className={`text-xs font-medium transition-all group uppercase flex items-center gap-4 ${
               activeSection === href.substring(1)
-                ? "text-indigo-600 dark:text-yellow-200"
-                : "text-gray-800 dark:text-gray-100"
+                ? "text-indigo-600 dark:text-white"
+                : "text-indigo-300 dark:text-slate-600"
             }`}
           >
-            <span className="group-hover:translate-x-1 transition-transform">
-              {label}
-            </span>
             <span
-              className={`absolute -bottom-1 left-0 w-0 h-0.25 bg-indigo-500 dark:bg-yellow-200 group-hover:w-full transition-all duration-300 ${
-                activeSection === href.substring(1) ? "w-full" : ""
+              className={`w-0 h-[1px] group-hover:bg-indigo-500 group-hover:dark:bg-white group-hover:w-16 transition-all duration-300 ${
+                activeSection === href.substring(1) ? "w-12 bg-indigo-500 dark:bg-white" : "w-6 bg-indigo-300 dark:bg-slate-600"
               }`}
             ></span>
+            <span className="whitespace-nowrap tracking-wider group-hover:text-indigo-600 group-hover:dark:text-white transition-all duration-300">
+              {label}
+            </span>
           </Link>
         </motion.div>
       ))}

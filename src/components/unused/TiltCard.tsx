@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 interface TiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  maxTilt?: number; // degré max d'inclinaison
+  maxTilt?: number;
 }
 
 export function TiltCard({ children, className = "", maxTilt = 15, ...props }: TiltCardProps) {
@@ -15,7 +15,7 @@ export function TiltCard({ children, className = "", maxTilt = 15, ...props }: T
     if (!card) return;
 
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left; // coord dans la card
+    const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
     const centerX = rect.width / 2;

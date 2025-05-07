@@ -1,7 +1,9 @@
 "use client";
 
+import { FaChevronRight } from "react-icons/fa";
 import ProjectsSection from "./ProjectSection";
 import projects from "@/lib/projects";
+import { FiGithub } from "react-icons/fi";
 
 export default function Projects() {
   return (
@@ -27,6 +29,12 @@ export default function Projects() {
             key={i}
           />
         ))}
+      </div>
+      <div className="flex justify-center">
+        <a href="https://github.com/rafael-tdp" className="text-sm font-normal text-gray-400 dark:text-gray-200 transition-all flex items-center hover:text-indigo-500 dark:hover:text-indigo-200">
+          Voir plus de projets
+          <FiGithub className="ml-3" size={18} />
+        </a>
       </div>
     </section>
   );
