@@ -27,8 +27,8 @@ export function AnimatedTiltCard({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = -((y - centerY) / centerY) * 10;
-    const rotateY = ((x - centerX) / centerX) * 10;
+    const rotateX = -((y - centerY) / centerY) * 3;
+    const rotateY = ((x - centerX) / centerX) * 3;
 
     card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   };

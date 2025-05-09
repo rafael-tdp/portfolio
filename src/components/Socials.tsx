@@ -36,7 +36,7 @@ export default function Socials() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.2, duration: 0.4 }}
         >
-          <Icon className="text-md md:text-2xl hover:text-gray-700 dark:hover:text-gray-300 transition-colors" />
+          <Icon className="text-base md:text-2xl hover:text-gray-700 dark:hover:text-gray-300 transition-colors" />
         </motion.a>
       ))}
     </div>

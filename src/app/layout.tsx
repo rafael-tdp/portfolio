@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MouseAura from "@/components/MouseAura";
+import { Providers } from "./providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,10 +23,7 @@ export default function RootLayout({
       <body
         className={`overflow-y-scroll no-scrollbar bg-slate-50 text-slate-700 dark:bg-slate-950 dark:text-slate-400 transition-colors duration-200 ${inter.className} max-w-screen-xl mx-auto`}
       >
-        <ThemeProvider attribute="data-theme" defaultTheme="dark">
-          <MouseAura />
-          {children}
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

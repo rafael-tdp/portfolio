@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import SectionTitle from "./SectionTitle";
 
 export default function About() {
   const javascriptTechs: string[] = [
@@ -68,16 +69,9 @@ export default function About() {
       whileInView="visible"
       viewport={{ once: false }}
     >
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-md font-medium mb-6 md:mb-12 text-gray-600 dark:text-gray-400 uppercase tracking-widest block md:hidden"
-      >
-        # A propos de moi
-      </motion.h2>
+      <SectionTitle className="block md:hidden"># à props de moi</SectionTitle>
 
-      <p className="text-sm sm:text-md text-slate-700 dark:text-slate-400 leading-relaxed">
+      <p className="text-sm sm:text-base text-slate-700 dark:text-slate-400 leading-relaxed">
         Bonjour ! Je m&apos;appelle <Strong>Rafael Tavares De Pinho</Strong>, et
         je suis un <Strong>développeur full-stack</Strong> passionné par la
         création d&apos;expériences web à la fois <Strong>intuitives</Strong>,{" "}
@@ -102,13 +96,13 @@ export default function About() {
         construire des solutions durables et bien pensées.
         <br />
         <br />
-        Je suis également passionné par les{" "}
+        {/* Je suis également passionné par les{" "}
         <Strong>technologies JavaScript</Strong>, que j&apos;utilise au
         quotidien à travers des frameworks et bibliothèques comme :
-        <br />
+        <br /> */}
       </p>
 
-      <ul className="flex flex-wrap text-sm mt-4 list-none">
+      {/* <ul className="flex flex-wrap text-sm mt-4 list-none">
         {javascriptTechs.map((tech, i) => (
           <motion.li
             key={tech}
@@ -122,7 +116,7 @@ export default function About() {
             {tech}
           </motion.li>
         ))}
-      </ul>
+      </ul> */}
     </motion.section>
   );
 }
