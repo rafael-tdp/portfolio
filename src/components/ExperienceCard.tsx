@@ -1,6 +1,7 @@
 import { AnimatedTiltCard } from "./AnimatedTiltCard";
 import TechnologyBadge from "./TechnologyBadge";
 import { FiArrowUpRight } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 type Experience = {
   title: string;
@@ -98,7 +99,15 @@ export default function ExperienceCard({
 
             <div className="mt-3 flex flex-wrap gap-3">
               {exp.tech.map((techId, index) => (
-                <TechnologyBadge key={index} id={techId} showIcon={true} />
+                <motion.div
+                  key={techId}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
+                  viewport={{ once: false }}
+                >
+                  <TechnologyBadge id={techId} showIcon={true} />
+                </motion.div>
               ))}
             </div>
           </div>

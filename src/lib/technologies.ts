@@ -19,6 +19,7 @@ import {
   SiSocketdotio,
   SiReact,
   SiHeroku,
+  SiJest,
 } from "react-icons/si";
 import { TbApi } from "react-icons/tb";
 
@@ -52,6 +53,8 @@ export const technologies: Technology[] = [
   { id: "openai", name: "OpenAI", icon: "SiOpenai" },
   { id: "socketio", name: "Socket.IO", icon: "SiSocketdotio" },
   { id: "heroku", name: "Heroku", icon: "SiHeroku" },
+  { id: "jest", name: "Jest", icon: "SiJest" },
+  { id: "git", name: "Git", icon: "SiGit" },
 ];
 
 export const iconMap: Record<string, React.ElementType> = {
@@ -78,4 +81,5 @@ export const iconMap: Record<string, React.ElementType> = {
   SiReact,
   SiHeroku,
   TbApi,
+  SiJest,
 };

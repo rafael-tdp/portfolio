@@ -15,7 +15,7 @@ const experiences: Experience[] = [
     period: "2023 – 2025",
     location: "Paris, France",
     description: `Développement et maintenance des fonctionnalités back-end sur deux applications web. Travail en étroite collaboration avec les équipes produit et front-end. Interventions ponctuelles sur le front pour intégrer ou adapter des composants existants.`,
-    tech: ["node", "express", "nestjs", "vue", "mongodb"],
+    tech: ["node", "express", "nestjs", "vue", "mongodb", "jest", "git"],
     href: "https://www.ownest.io",
   },
   {
@@ -24,7 +24,7 @@ const experiences: Experience[] = [
     period: "juin 2021 - août 2021",
     location: "Paris, France",
     description: `Création d'un site vitrine et d'un système de facturation personnalisé. Déploiement du site, configuration de l'hébergement et optimisation du référencement pour améliorer la visibilité de l'entreprise.`,
-    tech: ["node", "express", "vue", "postgresql", "tailwind"],
+    tech: ["node", "express", "vue", "postgresql", "tailwind", "git"],
     href: "https://www.lfp-ravalement.fr",
   },
   {

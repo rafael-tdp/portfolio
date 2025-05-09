@@ -9,7 +9,7 @@ const projects = [
     accentColor: "text-emerald-500",
     darkAccentColor: "text-emerald-300",
     shadowColor: "#059669",
-    tech: ["react", "tailwind", "apiplatform", "php", "postgresql", "docker"],
+    tech: ["react", "tailwind", "apiplatform", "php", "postgresql", "docker", "git"],
     details: [
       "Développement d'une interface fluide avec React et Tailwind CSS.",
       "Utilisation d'API Platform pour la création et documentation de l'API REST.",
@@ -28,7 +28,7 @@ const projects = [
     accentColor: "text-rose-500",
     darkAccentColor: "text-rose-300",
     shadowColor: "#DB2777",
-    tech: ["react", "tailwind", "node", "express", "docker", "openai"],
+    tech: ["react", "tailwind", "node", "express", "docker", "openai", "git"],
     details: [
       "Génération de recettes sur mesure grâce à l'intégration de l'API OpenAI.",
       "Interface utilisateur moderne et responsive conçue avec React et Tailwind.",
@@ -50,7 +50,7 @@ const projects = [
     accentColor: "text-indigo-500",
     darkAccentColor: "text-indigo-300",
     shadowColor: "#A855F7",
-    tech: ["react", "tailwind", "node", "express", "socketio", "mongodb"],
+    tech: ["react", "tailwind", "node", "express", "socketio", "mongodb", "git"],
     details: [
       "Jeu multijoueur en temps réel développé avec Socket.IO.",
       "Interface conviviale et réactive grâce à React et Tailwind CSS.",

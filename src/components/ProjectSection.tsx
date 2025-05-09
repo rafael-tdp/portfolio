@@ -83,15 +83,22 @@ export default function ProjectsSection({
               ))}
             </ul>
             <div className="mt-10 flex flex-wrap gap-3 text-sm">
-              {tech.map((techId) => (
-                <TechnologyBadge
+              {tech.map((techId, index) => (
+                <motion.div
                   key={techId}
-                  id={techId}
-                  showIcon={true}
-                  bgColor="bg-transparent"
-                  accentColor={accentColor}
-                  darkAccentColor={darkAccentColor}
-                />
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
+                  viewport={{ once: false }}
+                >
+                  <TechnologyBadge
+                    id={techId}
+                    showIcon={true}
+                    bgColor="bg-transparent"
+                    accentColor={accentColor}
+                    darkAccentColor={darkAccentColor}
+                  />
+                </motion.div>
               ))}
             </div>
           </div>
