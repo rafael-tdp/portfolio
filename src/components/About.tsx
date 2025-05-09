@@ -4,15 +4,15 @@ import { motion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 
 export default function About() {
-  const javascriptTechs: string[] = [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "Vue.js",
-    "NestJS",
-    "Next.js",
-  ];
+  // const javascriptTechs: string[] = [
+  //   "JavaScript",
+  //   "TypeScript",
+  //   "React",
+  //   "Node.js",
+  //   "Vue.js",
+  //   "NestJS",
+  //   "Next.js",
+  // ];
 
   const containerVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -35,18 +35,18 @@ export default function About() {
     },
   };
 
-  const listItemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.05,
-        duration: 0.3,
-        ease: "easeOut",
-      },
-    }),
-  };
+  // const listItemVariants = {
+  //   hidden: { opacity: 0, x: -10 },
+  //   visible: (i: number) => ({
+  //     opacity: 1,
+  //     x: 0,
+  //     transition: {
+  //       delay: i * 0.05,
+  //       duration: 0.3,
+  //       ease: "easeOut",
+  //     },
+  //   }),
+  // };
 
   const Strong = ({ children }: { children: React.ReactNode }) => (
     <motion.strong
