@@ -53,7 +53,7 @@ export default function About() {
       variants={strongVariants}
       initial="opacity-0"
       whileInView="opacity-100"
-      viewport={{ once: false }}
+      viewport={{ once: true }}
       className="font-semibold text-indigo-600 dark:text-yellow-200"
     >
       {children}
@@ -67,7 +67,7 @@ export default function About() {
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false }}
+      viewport={{ once: true }}
     >
       <SectionTitle className="block md:hidden"># à props de moi</SectionTitle>
 
@@ -110,7 +110,7 @@ export default function About() {
             variants={listItemVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: false }}
+            viewport={{ once: true }}
             className="w-1/2 mb-1 before:content-['▹'] before:text-indigo-600 dark:before:text-yellow-200 before:mr-2"
           >
             {tech}

@@ -44,7 +44,7 @@ export function AnimatedTiltCard({
       initial={{ opacity: 0, y: 40, scale: 0.96 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.6, delay }}
-      viewport={{ once: false, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.2 }}
       className="[perspective:1000px]"
     >
       <div
