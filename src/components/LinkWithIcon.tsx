@@ -24,7 +24,7 @@ export default function LinkWithIcon({
         href={href}
         target={newTab ? "_blank" : undefined}
         rel={newTab ? "noopener noreferrer" : undefined}
-        className={`group text-sm font-normal text-gray-400 dark:text-gray-200 transition-all flex items-center hover:text-indigo-500 dark:hover:text-yellow-300 ${className}`}
+        className={`group text-sm font-normal text-indigo-600 dark:text-gray-200 transition-all flex items-center hover:text-indigo-400 dark:hover:text-yellow-200 ${className}`}
       >
         {text}
         {Icon && (
