@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import AvailabilityIndicator from "@/components/AvailabilityIndicator";
 import Experiences from "@/components/Experiences";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -11,6 +12,8 @@ export default function Home() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeSwitch />
       </div>
+
+      <AvailabilityIndicator/>
 
       <div className="flex flex-col md:grid md:grid-cols-[auto,1fr] md:gap-4 h-full">
         <div className="md:fixed md:h-full max-h-100vh md:h-screen">

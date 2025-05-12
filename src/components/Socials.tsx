@@ -1,6 +1,6 @@
 "use client";
 
-import { FiGithub, FiLinkedin } from "react-icons/fi";
+import { FiGithub, FiInstagram, FiLinkedin } from "react-icons/fi";
 import { FaXTwitter } from "react-icons/fa6";
 import { motion } from "framer-motion";
 
@@ -19,6 +19,11 @@ const socials = [
     name: "Twitter",
     url: "https://twitter.com/rafael-tdp",
     icon: FaXTwitter,
+  },
+  {
+    name: "Instagram",
+    url: "https://instagram.com/rafael_tdp",
+    icon: FiInstagram,
   },
 ];
 
