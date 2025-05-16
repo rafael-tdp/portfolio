@@ -19,7 +19,7 @@ const experiences: Experience[] = [
     href: "https://www.ownest.io",
   },
   {
-    title: "Développeur Full-Stack (stage)",
+    title: "Développeur Full Stack (stage)",
     company: "LFP Ravalement",
     period: "juin 2021 - août 2021",
     location: "Paris, France",
@@ -28,7 +28,7 @@ const experiences: Experience[] = [
     href: "https://www.lfp-ravalement.fr",
   },
   {
-    title: "Développeur Full-Stack (stage)",
+    title: "Développeur Full Stack (stage)",
     company: "Sport Management System",
     period: "juin 2020 - août 2020",
     location: "Paris, France",

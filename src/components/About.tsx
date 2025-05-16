@@ -73,7 +73,7 @@ export default function About() {
 
       <p className="text-sm sm:text-base text-slate-700 dark:text-slate-400 leading-relaxed">
         Bonjour ! Je m&apos;appelle <Strong>Rafael Tavares De Pinho</Strong>, et
-        je suis un <Strong>développeur full-stack</Strong> passionné par la
+        je suis un <Strong>développeur full stack</Strong> passionné par la
         création d&apos;expériences web à la fois <Strong>intuitives</Strong>,{" "}
         <Strong>accessibles</Strong> et <Strong>performantes</Strong>.
         <br />

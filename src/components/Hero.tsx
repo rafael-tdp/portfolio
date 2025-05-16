@@ -22,7 +22,7 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-lg md:text-2xl tracking-tight font-medium text-slate-600 dark:text-gray-300 mb-4 bg-indigo-300 dark:bg-indigo-800 md:bg-transparent md:dark:bg-transparent py-1 md:py-0 inline-block md:block"
       >
-        Développeur Full-Stack
+        Développeur Full Stack
       </motion.p>
 
       <motion.p
