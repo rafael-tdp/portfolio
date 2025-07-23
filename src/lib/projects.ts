@@ -24,6 +24,7 @@ const projects = [
     description:
       "Une application de recherche intelligente de recettes de cuisine.",
     image: "/img/projects/cuisine-connect.png",
+    href: "https://cuisineconnect-1.onrender.com/",
     gradient: "from-rose-700 to-rose-300",
     accentColor: "text-rose-500",
     darkAccentColor: "text-rose-300",
