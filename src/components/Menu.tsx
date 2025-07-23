@@ -8,6 +8,7 @@ const menuItems = [
   { label: "À propos de moi", href: "#about" },
   { label: "Expériences", href: "#experience" },
   { label: "Projets", href: "#projects" },
+  { label: "Compétences", href: "#skills" },
 ];
 
 export default function Menu() {
@@ -22,7 +23,7 @@ export default function Menu() {
           }
         });
       },
-      { threshold: 0.6 }
+      { threshold: 0.3 }
     );
 
     const sections = document.querySelectorAll("section");
