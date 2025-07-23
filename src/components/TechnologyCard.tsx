@@ -16,7 +16,8 @@ function hexToHsl(hex: string): [number, number, number] {
 
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
+    let h = 0, s = 0
+    const l = (max + min) / 2;
 
     if (max !== min) {
         const d = max - min;
@@ -61,9 +62,8 @@ function getAdaptiveColor(originalColor: string): { lightMode: string; darkMode:
     return { lightMode: lightModeColor, darkMode: darkModeColor };
 }
 
-export default function TechnologyCard({ id, icon, name, color }: Props) {
+export default function TechnologyCard({ icon, name, color }: Props) {
     const IconComponent = iconMap[icon];
-    const rotateRef = useRef(Math.random() > 0.5 ? "-rotate-2" : "rotate-2");
 
     const adaptiveColors = getAdaptiveColor(color || '');
 
