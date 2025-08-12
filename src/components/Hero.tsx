@@ -13,7 +13,7 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0 }}
         className="text-3xl md:text-5xl font-semibold md:font-bold mb-4 tracking-tight dark:text-gray-100 block"
       >
-        Rafael Tavares De Pinho
+        Eduardo Salvador
       </motion.a>
 
       <motion.p
