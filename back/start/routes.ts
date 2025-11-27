@@ -40,6 +40,39 @@ router.get('/uploads/companies/:companyId/:file', async (ctx: any) => {
   return ctx.response.send(data)
 })
 
+// Proxy for GCS images to avoid CORS issues
+router.get('/api/proxy-image', async (ctx: any) => {
+  const url = ctx.request.qs()?.url
+  if (!url || typeof url !== 'string') {
+    return ctx.response.badRequest({ error: 'Missing url parameter' })
+  }
+  
+  // Only allow proxying from our GCS bucket
+  if (!url.includes('storage.googleapis.com/rafaeltavares-bucket')) {
+    return ctx.response.badRequest({ error: 'Invalid URL' })
+  }
+  
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return ctx.response.status(response.status).send({ error: 'Failed to fetch image' })
+    }
+    
+    const contentType = response.headers.get('content-type') || 'application/octet-stream'
+    const buffer = await response.arrayBuffer()
+    
+    ctx.response.header('Access-Control-Allow-Origin', '*')
+    ctx.response.header('Content-Type', contentType)
+    ctx.response.header('Content-Length', String(buffer.byteLength))
+    ctx.response.header('Cache-Control', 'public, max-age=31536000')
+    
+    return ctx.response.send(Buffer.from(buffer))
+  } catch (e) {
+    console.error('[proxy-image] error:', e)
+    return ctx.response.status(500).send({ error: 'Failed to proxy image' })
+  }
+})
+
 // Note: CORS headers and OPTIONS preflight handling are applied in the
 // `handler` wrapper for API routes. Avoid using `router.options` because
 // the router implementation may not expose an `options` method.

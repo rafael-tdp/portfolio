@@ -14,7 +14,7 @@ const cvSample = {
             school: "École Supérieure de Génie Informatique (ESGI) - Paris",
         },
         {
-            title: "Licence Professionnelle Développement Web & Mobile",
+            title: "Licence Pro. Dév. Web & Mobile",
             period: "Sep 2020 - Août 2021",
             school: "IUT de Bobigny - Sorbonne Paris Nord - Bobigny",
         },
@@ -31,7 +31,7 @@ const cvSample = {
         {
             company: "Ownest",
             role: "Développeur Full Stack",
-            period: "Janvier 2023 - Janvier 2025",
+            period: "Janv 2023 - Janv 2025",
             bullets: [
                 "Ajout d’export de données, corrections de bugs sur les API <strong>Node.js</strong> (Express et NestJS), optimisation de requêtes <strong>MongoDB</strong> et tests avec <strong>Jest</strong>.",
                 "Intégration de nouvelles fonctionnalités en <strong>Vue.js</strong> et création de composants.",
@@ -61,7 +61,7 @@ const cvSample = {
     projects: [
         {
             name: "Application de souvenirs personnels",
-            period: "Janvier 2025 - Aujourd’hui",
+            period: "Janv 2025 - Aujourd’hui",
             description: [
                 "Développement d’une application de souvenirs personnels avec <strong>React</strong> et <strong>Node.js</strong>, intégrant collections, calendrier et galerie photo.",
                 "Mise en cache avec <strong>Redis</strong>, déploiement de l’API avec <strong>AWS (EC2, PM2)</strong> avec automatisation du workflow via <strong>GitHub Actions</strong> et stockage sur <strong>Google Cloud Storage</strong>.",
@@ -69,7 +69,7 @@ const cvSample = {
         },
         {
             name: "Scholaria — Gestion d'établissement scolaire",
-            period: "Décembre 2024",
+            period: "Déc 2024",
             description: [
                 "Création d’une application de gestion d’établissements scolaires en <strong>Vue.js</strong> et <strong>Node.js</strong>.",
                 "Mise en place d’un système de replanification des cours annulés via drag & drop.",
@@ -78,7 +78,7 @@ const cvSample = {
         },
         {
             name: "Pilot — Plateforme de prise de rendez-vous",
-            period: "Avril 2024 - Juillet 2024",
+            period: "Avril 2024 - Juil 2024",
             description: [
                 "Développement d’une application web de réservation de prestations automobiles.",
                 "Conception d’une API sous <strong>API Platform</strong> avec gestion des rôles, des réservations, des notifications, et des demandes de prestataires.",

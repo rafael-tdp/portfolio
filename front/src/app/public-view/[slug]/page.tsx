@@ -6,6 +6,8 @@ import CopySlugBadge from "../../../components/CopySlugBadge";
 import VisitTracker from "../../../components/VisitTracker";
 import cvSample from "../../../data/cvSample";
 import CollapsibleSection from "../../../components/CollapsibleSection";
+import DownloadButtons from "../../../components/DownloadButtons";
+import { GoLink } from "react-icons/go";
 
 interface Props {
 	params: { slug: string };
@@ -252,8 +254,9 @@ export default async function Page({ params }: Props) {
 				</div>
 
 				<div className="max-w-5xl mx-auto p-6 md:p-8">
-					<div className="mb-10 text-sm text-gray-500 flex items-center">
-						Partagé publiquement via{" "}
+					<div className="mb-12 inline-flex items-center gap-2 text-sm text-gray-500">
+						<GoLink size={14} />
+						<span>Lien de partage</span>
 						<CopySlugBadge
 							slug={company?.publicSlug}
 							accent={themeFinal.accent}
@@ -261,18 +264,38 @@ export default async function Page({ params }: Props) {
 						/>
 					</div>
 
-					<div className="mb-10 text-base text-gray-700 font-light">
-						Bonjour,
-						<br />
-						Je vous adresse ma candidature pour le poste de{" "}
-						<span className="font-semibold">
-							{application?.jobTitle || "—"}
-						</span>
-						.
-						<br />
-						Veuillez trouver ci-joints mon CV et ma lettre de motivation,
-						qui présentent mes compétences, mon expérience et ma motivation
-						pour rejoindre vos équipes.
+					<div className="mb-12 text-base text-gray-700 leading-relaxed">
+						<p>
+							Merci de prendre le temps de consulter ma candidature pour le poste de{" "}
+							<span className="font-semibold" style={{ color: themeFinal.primary }}>
+								{application?.jobTitle || "—"}
+							</span>.
+						</p>
+						<p className="mt-2 text-gray-700">
+							Vous trouverez ci-dessous mon CV ainsi que ma lettre de motivation, 
+							qui détaillent mon parcours et ma motivation à rejoindre {company?.name}.
+						</p>
+					</div>
+
+					{/* Download & Portfolio Links */}
+					<div className="mb-10">
+						<DownloadButtons
+							cvData={cvSample}
+							coverLetterData={{
+								text: application?.coverLetter || "",
+								applicantName: application?.applicantName || cvSample.name,
+								date: new Date().toLocaleDateString(),
+								companyName: company?.name,
+								jobTitle: application?.jobTitle,
+								logoUrl: logoSrc,
+							}}
+							theme={themeFinal}
+							jobTitle={application?.jobTitle}
+							logoUrl={logoSrc ?? undefined}
+							companyName={company?.name}
+							applicantName={cvSample?.name}
+							portfolioUrl="/"
+						/>
 					</div>
 
 					{/* CV Section */}

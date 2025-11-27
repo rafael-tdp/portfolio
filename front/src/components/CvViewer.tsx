@@ -1,11 +1,7 @@
 "use client";
 
 import React from "react";
-import { toast } from "sonner";
 import CvHtml from "./CvHtml";
-import Button from "./Button";
-import { Tailwind, compile } from "@fileforge/react-print";
-import { LuDownload } from "react-icons/lu";
 
 type CVData = any;
 
@@ -15,7 +11,7 @@ export default function CvViewer({
 	showHtml = false,
 	theme,
 	jobTitle,
-    logoUrl,
+	logoUrl,
 }: {
 	pdfSrc?: string;
 	data?: CVData;
@@ -25,100 +21,14 @@ export default function CvViewer({
 	logoUrl?: string;
 }) {
 	const [showHtmlState, setShowHtmlState] = React.useState<boolean>(showHtml);
-	const [printing, setPrinting] = React.useState<boolean>(false);
-
-	async function handlePrint() {
-		try {
-			setPrinting(true);
-			const el = document.getElementById("cv-content");
-			if (!el) {
-				toast.error("CV content not found on the page");
-				setPrinting(false);
-				return;
-			}
-
-			const html = await getHTML();
-			const BACKEND =
-				process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-
-			const res = await fetch(`${BACKEND}/api/pdf/generate`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ html, baseUrl: window.location.origin }),
-			});
-
-			if (!res.ok) {
-				const txt = await res.text();
-				throw new Error(`PDF generation failed: ${res.status} ${txt}`);
-			}
-
-			const contentType = res.headers.get("content-type") || "";
-			if (contentType.includes("application/json")) {
-				const j = await res.json();
-				if (j.pdfBase64) {
-					const b = Uint8Array.from(atob(j.pdfBase64), (c) =>
-						c.charCodeAt(0)
-					);
-					const blob = new Blob([b], { type: "application/pdf" });
-					const url = URL.createObjectURL(blob);
-					const a = document.createElement("a");
-					a.href = url;
-					a.download = `cv.pdf`;
-					document.body.appendChild(a);
-					a.click();
-					a.remove();
-					URL.revokeObjectURL(url);
-				}
-				setPrinting(false);
-				return;
-			}
-
-			// Otherwise assume PDF binary
-			const blob = await res.blob();
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = `cv.pdf`;
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			URL.revokeObjectURL(url);
-		} catch (e: any) {
-			console.error(e);
-			toast.error("Erreur lors du téléchargement du CV");
-		} finally {
-			setPrinting(false);
-		}
-	}
-
-	async function getHTML() {
-		return await compile(
-			<Tailwind>
-				<CvHtml data={data} theme={theme} jobTitle={jobTitle} logoUrl={logoUrl} />
-			</Tailwind>
-		);
-	}
 
 	// Simple viewer: show HTML replica or embed a static PDF if provided.
 	if (showHtmlState && data) {
 		return (
-			<div className="relative flex m-auto gap-2 justify-center">
+			<div className="flex m-auto justify-center">
 				<div className="border border-gray-200 shadow-lg">
 					<CvHtml data={data} theme={theme} jobTitle={jobTitle} logoUrl={logoUrl} />
 				</div>
-				<Button
-					onClick={async () => {
-
-						await handlePrint();
-					}}
-					disabled={printing}
-					loading={printing}
-					className="absolute top-0 right-2 text-white border-none"
-					style={{
-						backgroundColor: theme?.primary,
-					}}
-					icon={<LuDownload size={16} />}
-				></Button>
 			</div>
 		);
 	}

@@ -33,7 +33,7 @@ export default function CopySlugBadge({
 
 	return (
 		<span
-			className="rounded px-2 py-1 inline-flex items-center gap-2 cursor-pointer ml-2 text-xs"
+			className="rounded px-2 py-1 inline-flex items-center gap-2 cursor-pointer text-xs"
 			style={{ color: accent, backgroundColor: bg }}
 			onClick={handleClick}
 			role="button"

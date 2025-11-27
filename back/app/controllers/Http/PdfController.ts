@@ -3,11 +3,12 @@ import puppeteer from 'puppeteer'
 
 export default class PdfController {
   public async generatePdf({ request, response }: HttpContextContract) {
-    const body = request.only(['slug', 'url', 'debug', 'html', 'baseUrl'])
+    const body = request.only(['slug', 'url', 'debug', 'html', 'baseUrl', 'title'])
     const slug = body.slug
     const explicitUrl = body.url
     const debug = !!body.debug
     const htmlPayload = body.html
+    const pdfTitle = body.title || 'Document'
     const baseUrl =
       body.baseUrl ||
       process.env.FRONTEND_URL ||
@@ -16,8 +17,25 @@ export default class PdfController {
 
     let browser: puppeteer.Browser | null = null
     try {
-      browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+      console.log('[PdfController] Launching browser...')
+      
+      browser = await puppeteer.launch({ 
+        headless: true,
+        args: [
+          '--no-sandbox', 
+          '--disable-setuid-sandbox', 
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+        ],
+      })
+      console.log('[PdfController] Browser launched successfully')
       const page = await browser.newPage()
+      console.log('[PdfController] New page created')
+      
+      // Set longer timeout for the page
+      page.setDefaultTimeout(60000)
+      page.setDefaultNavigationTimeout(60000)
+      
       await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 }) // A4 en 96dpi
 
       if (htmlPayload) {
@@ -26,33 +44,24 @@ export default class PdfController {
         const trimmed = fullHtml.trim().toLowerCase()
         if (!trimmed.startsWith('<!doctype') && !trimmed.startsWith('<html')) {
           // Ensure base tag so relative URLs resolve (images, fonts)
-          fullHtml = `<!doctype html><html><head><meta charset="utf-8"><base href="${baseUrl}"></head><body>${fullHtml}</body></html>`
+          fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${pdfTitle}</title><base href="${baseUrl}"></head><body>${fullHtml}</body></html>`
         }
 
-        await page.setContent(fullHtml, { waitUntil: 'networkidle0', timeout: 30000 })
+        // Set content and wait for DOM to be ready
+        console.log('[PdfController] Setting HTML content...')
+        await page.setContent(fullHtml, { waitUntil: 'load', timeout: 60000 })
+        console.log('[PdfController] Content loaded')
 
-        // Wait for images to load
-        try {
-          await page.evaluate(async () => {
-            const imgs = Array.from(((globalThis as any).document?.images) || [])
-            await Promise.all(
-              imgs.map((img: any) => {
-                if (img.complete) return Promise.resolve()
-                return new Promise((resolve) => {
-                  img.onload = img.onerror = () => resolve(null)
-                })
-              })
-            )
-          })
-        } catch (e) {
-          // ignore
-        }
+        // Wait for rendering to complete
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        console.log('[PdfController] Generating PDF...')
 
         const pdfBuffer = await page.pdf({
           format: 'A4',
           printBackground: true,
           scale: 1,
           margin: { top: 0, left: 0, right: 0, bottom: 0 },
+          timeout: 60000,
         })
 
         if (debug) {
@@ -111,6 +120,7 @@ export default class PdfController {
         format: 'A4',
         printBackground: true,
         margin: { top: '0', bottom: '0', left: '0', right: '0' },
+        timeout: 60000,
       })
 
       if (debug) {

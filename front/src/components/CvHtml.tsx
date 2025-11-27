@@ -163,6 +163,11 @@ export default function CvHtml({
 			id="cv-content"
 			className="bg-white overflow-hidden relative text-[0.65rem] w-[794px] h-[1123px]"
 		>
+			<style>{`
+				#cv-content strong {
+					font-weight: 500;
+				}
+			`}</style>
 			<header
 				className="absolute top-10 left-10 right-10 flex gap-4 p-1 rounded-full text-white overflow-hidden"
 				style={{ backgroundColor: theme?.background }}
@@ -187,11 +192,11 @@ export default function CvHtml({
 					>
 						{d.name}
 					</h1>
-					<h2 className="text-2xl font-semibold tracking-wide uppercase">
+					<h2 className="text-2xl font-semibold tracking-wide uppercase z-10">
 						{jobTitle || d.title}
 					</h2>
 					<h3
-						className="text-base uppercase font-medium"
+						className="text-base uppercase font-medium z-10"
 						style={{
 							color: getLighterColor(theme?.background, 0.7),
 						}}
@@ -366,7 +371,7 @@ export default function CvHtml({
 										</div>
 									</div>
 									{ex.bullets && (
-										<ul className="mt-1 list-disc list-outside text-gray-700">
+										<ul className="mt-1 list-disc list-inside text-gray-700">
 											{ex.bullets.map(
 												(b: string, bi: number) => (
 													<li
@@ -389,11 +394,16 @@ export default function CvHtml({
 						<div className="mt-3 space-y-4 text-gray-700 text-[0.73rem]">
 							{d.formations?.map((f: any, i: number) => (
 								<div key={i}>
-									<div className="font-semibold">
-										{f.title}
+									<div className="flex justify-between">
+										<div className="font-semibold">
+											{f.title}
+										</div>
+										<div className="text-gray-500 font-normal text-[0.65rem]">
+											{f.period}
+										</div>
 									</div>
 									<div className="text-gray-500">
-										{f.period} | {f.school}
+										{f.school}
 									</div>
 								</div>
 							))}
@@ -405,13 +415,15 @@ export default function CvHtml({
 						<div className="mt-3 space-y-4 text-gray-700">
 							{d.projects?.map((p: any, i: number) => (
 								<div key={i}>
-									<div className="text-[0.73rem] flex justify-between mb-1">
-										{p.name}{" "}
+									<div className="flex justify-between mb-1">
+										<span className="text-[0.73rem] font-semibold">
+											{p.name}{" "}
+										</span>
 										<span className="text-gray-500 text-[0.65rem]">
 											{p.period}
 										</span>
 									</div>
-									<ul className="list-disc list-outside">
+									<ul className="list-disc list-inside">
 										{p.description?.map(
 											(desc: string, di: number) => (
 												<li

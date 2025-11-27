@@ -60,6 +60,7 @@ export default function ApplicationForm({
 		string
 	> | null>((initial.companyTheme as any) || null);
 	const [editingColorKey, setEditingColorKey] = useState<string | null>(null);
+	const [showColors, setShowColors] = useState(false);
 	const [jobTitle, setJobTitle] = useState(initial.jobTitle || "");
 	const [jobDescription, setJobDescription] = useState(
 		initial.jobDescription || ""
@@ -68,6 +69,7 @@ export default function ApplicationForm({
 	const [companyId, setCompanyId] = useState<string | null>(
 		initial.companyId || null
 	);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [publicSlug, setPublicSlug] = useState<string | null>(
 		initial.publicSlug || null
 	);
@@ -75,6 +77,31 @@ export default function ApplicationForm({
 		initial.applicationId || null
 	);
 	const [loading, setLoading] = useState(false);
+
+	// Helper to extract colors from theme if no colors are available
+	function colorsFromTheme(theme: Record<string, string> | null): Record<string, string> | null {
+		if (!theme) return null;
+		const themeColors = [theme.primary, theme.secondary, theme.accent, theme.background, theme.text, theme.title].filter(Boolean);
+		if (themeColors.length === 0) return null;
+		const out: Record<string, string> = {};
+		themeColors.forEach((c, i) => {
+			out[`color${i + 1}`] = c;
+		});
+		return out;
+	}
+
+	// Sync state with initial data when it changes (e.g., after async fetch)
+	React.useEffect(() => {
+		if (initial.companyColors) {
+			setCompanyColors(normalizeColors(initial.companyColors));
+		} else if (initial.companyTheme) {
+			// If no colors but we have a theme, extract colors from theme
+			setCompanyColors(colorsFromTheme(initial.companyTheme));
+		}
+		if (initial.companyTheme) {
+			setCompanyTheme(initial.companyTheme);
+		}
+	}, [initial.companyColors, initial.companyTheme]);
 
 	function resolveLogoUrl(url: string | null | undefined) {
 		if (!url) return null;
@@ -330,7 +357,7 @@ export default function ApplicationForm({
 					<FormSectionTitle className="mb-8">
 						1. L&apos;entreprise
 					</FormSectionTitle>
-					<div className="flex flex-col gap-10">
+					<div className="flex flex-col gap-6">
 						<div className="md:col-span-2">
 							<TextField
 								id="company-name"
@@ -338,16 +365,6 @@ export default function ApplicationForm({
 								value={companyName}
 								onChange={(e) => setCompanyName(e.target.value)}
 							/>
-							<div className="mt-3 text-sm text-gray-500">
-								{companyId && (
-									<div className="mt-2 text-sm text-gray-600">
-										ID: {companyId}{" "}
-										{publicSlug
-											? ` • slug: ${publicSlug}`
-											: ""}
-									</div>
-								)}
-							</div>
 						</div>
 
 						<div className="md:flex md:flex-col">
@@ -372,275 +389,207 @@ export default function ApplicationForm({
 					</div>
 
 					{companyColors && (
-						<div className="mt-4">
-							<div className="text-sm font-medium text-gray-700 mb-2 mt-10">
-								Palette détectée
-							</div>
-							<div className="grid grid-cols-2 gap-3">
-								{Object.entries(companyColors).map(([k, v]) => (
-									<div
-										key={k}
-										className="relative flex items-center gap-3 p-2 rounded border border-gray-300"
-									>
-										<div
-											className="w-10 h-10 rounded-sm"
-											style={{
-												background: v,
-												border: "1px solid rgba(0,0,0,0.06)",
-											}}
-										/>
-										<div className="flex-1">
-											<div className="text-xs text-gray-600">
-												{getColorNameFromKey(k)}
-											</div>
-											<div className="flex items-center gap-2 mt-1">
-												<input
-													className="font-mono text-sm border rounded px-2 py-1 w-28 border-gray-300"
-													value={v}
-													onChange={(e) => {
-														const newHex =
-															e.target.value;
-														setCompanyColors(
-															(prev) =>
-																prev
-																	? {
-																			...prev,
-																			[k]: newHex,
-																	  }
-																	: prev
-														);
+						<div className="mt-6">
+							{/* Bouton toggle avec aperçu des couleurs */}
+							<button
+								type="button"
+								onClick={() => setShowColors(!showColors)}
+								className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 bg-white transition-colors"
+							>
+								<div className="flex items-center gap-3">
+									<span className="text-sm font-medium text-gray-700">
+										Palette de couleurs
+									</span>
+									{/* Aperçu des couleurs */}
+									<div className="flex -space-x-1">
+										{Object.values(companyColors).slice(0, 6).map((color, i) => (
+											<div
+												key={i}
+												className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+												style={{ backgroundColor: color }}
+											/>
+										))}
+									</div>
+								</div>
+								<svg
+									className={`w-5 h-5 text-gray-400 transition-transform ${showColors ? 'rotate-180' : ''}`}
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+								</svg>
+							</button>
+
+							{/* Contenu des couleurs (affiché/caché) */}
+							{showColors && (
+								<div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+									<div className="text-sm font-medium text-gray-700 mb-3">
+										Palette détectée
+									</div>
+									<div className="grid grid-cols-2 gap-3">
+										{Object.entries(companyColors).map(([k, v]) => (
+											<div
+												key={k}
+												className="relative flex items-center gap-3 p-2 rounded border border-gray-300 bg-white"
+											>
+												<div
+													className="w-10 h-10 rounded-sm"
+													style={{
+														background: v,
+														border: "1px solid rgba(0,0,0,0.06)",
 													}}
 												/>
-												<Button
-													className="text-xs px-1 py-1 ml-auto"
-													variant="neutral"
-													onClick={() => {
-														setEditingColorKey(k);
-													}}
-												>
-													<LuPipette />
-												</Button>
-												<Button
-													className="text-xs px-1 py-1"
-													variant="neutral"
-													onClick={() => {
-														navigator.clipboard?.writeText(
-															v
-														);
-													}}
-												>
-													<LuCopy />
-												</Button>
-											</div>
-										</div>
-
-										{editingColorKey === k &&
-											(companyLogoUrl ||
-												logoPreviewUrl) && (
-												<div className="absolute z-50 right-0 top-0 w-80">
-													<div className="p-3 rounded bg-white shadow-lg border border-gray-300">
-														<LogoColorPicker
-															pipetteMode={true}
-															initialUrl={
-																resolveLogoUrl(
-																	companyLogoUrl
-																) ||
-																logoPreviewUrl
-															}
-															onPickColor={(
-																hex: string
-															) => {
-																setCompanyColors(
-																	(prev) =>
-																		prev
-																			? {
-																					...prev,
-																					[k]: hex,
-																			  }
-																			: prev
-																);
-																setEditingColorKey(
-																	null
+												<div className="flex-1">
+													<div className="text-xs text-gray-600">
+														{getColorNameFromKey(k)}
+													</div>
+													<div className="flex items-center gap-2 mt-1">
+														<input
+															className="font-mono text-sm border rounded px-2 py-1 w-28 border-gray-300"
+															value={v}
+															onChange={(e) => {
+																const newHex = e.target.value;
+																setCompanyColors((prev) =>
+																	prev ? { ...prev, [k]: newHex } : prev
 																);
 															}}
 														/>
-														<div className="mt-2 text-right">
-															<Button
-																size="sm"
-																variant="ghost"
-																onClick={() =>
-																	setEditingColorKey(
-																		null
-																	)
-																}
+														<Button
+															className="text-xs px-1 py-1 ml-auto"
+															variant="neutral"
+															onClick={() => setEditingColorKey(k)}
+														>
+															<LuPipette />
+														</Button>
+														<Button
+															className="text-xs px-1 py-1"
+															variant="neutral"
+															onClick={() => navigator.clipboard?.writeText(v)}
+														>
+															<LuCopy />
+														</Button>
+													</div>
+												</div>
+
+												{editingColorKey === k && (companyLogoUrl || logoPreviewUrl) && (
+													<div className="absolute z-50 right-0 top-0 w-80">
+														<div className="p-3 rounded bg-white shadow-lg border border-gray-300">
+															<LogoColorPicker
+																pipetteMode={true}
+																initialUrl={resolveLogoUrl(companyLogoUrl) || logoPreviewUrl}
+																onPickColor={(hex: string) => {
+																	setCompanyColors((prev) =>
+																		prev ? { ...prev, [k]: hex } : prev
+																	);
+																	setEditingColorKey(null);
+																}}
+															/>
+															<div className="mt-2 text-right">
+																<Button
+																	size="sm"
+																	variant="ghost"
+																	onClick={() => setEditingColorKey(null)}
+																>
+																	Fermer
+																</Button>
+															</div>
+														</div>
+													</div>
+												)}
+											</div>
+										))}
+									</div>
+
+									<div className="mt-6">
+										<div className="text-sm font-medium text-gray-700 mb-2">
+											Assigner les couleurs
+										</div>
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+											{[
+												{ key: "background", label: "Couleur de fond" },
+												{ key: "text", label: "Couleur du texte" },
+												{ key: "primary", label: "Couleur principale" },
+												{ key: "accent", label: "Couleur d'accent" },
+												{ key: "title", label: "Couleur du titre" },
+												{ key: "secondary", label: "Couleur secondaire" },
+											].map((r) => (
+												<div
+													key={r.key}
+													className="flex items-center gap-3 p-2 rounded border border-gray-300 bg-white"
+												>
+													<div
+														className="w-10 h-10 rounded-sm"
+														style={{
+															background:
+																(companyTheme && (companyTheme as any)[r.key]) ||
+																Object.values(companyColors)[0],
+															border: "1px solid rgba(0,0,0,0.06)",
+														}}
+													/>
+													<div className="flex-1">
+														<div className="text-xs text-gray-600">{r.label}</div>
+														<div className="flex flex-col gap-2 mt-1">
+															<select
+																className="border rounded px-2 py-1 text-sm border-gray-300"
+																value={(companyTheme && (companyTheme as any)[r.key]) || ""}
+																onChange={(e) => {
+																	const hex = e.target.value || "";
+																	setCompanyTheme((prev) => ({
+																		...(prev || {}),
+																		[r.key]: hex,
+																	}));
+																}}
 															>
-																Fermer
-															</Button>
+																<option value="">Choisir depuis la palette</option>
+																{Object.entries(companyColors).map(([k, v]) => (
+																	<option key={k} value={v}>
+																		{k} — {v}
+																	</option>
+																))}
+															</select>
+															<div className="flex items-center gap-2">
+																<input
+																	type="color"
+																	value={
+																		((companyTheme && (companyTheme as any)[r.key]) as string) ||
+																		Object.values(companyColors)[0] ||
+																		"#000000"
+																	}
+																	onChange={(e) =>
+																		setCompanyTheme((prev) => ({
+																			...(prev || {}),
+																			[r.key]: e.target.value,
+																		}))
+																	}
+																	className="w-10 h-8 p-0 border rounded cursor-pointer border-gray-300"
+																	title="Sélectionner une couleur"
+																/>
+																<input
+																	className="font-mono text-sm border rounded px-2 py-1 border-gray-300 w-full"
+																	value={
+																		((companyTheme && (companyTheme as any)[r.key]) as string) || ""
+																	}
+																	onChange={(e) =>
+																		setCompanyTheme((prev) => ({
+																			...(prev || {}),
+																			[r.key]: e.target.value,
+																		}))
+																	}
+																	placeholder="#rrggbb"
+																/>
+															</div>
 														</div>
 													</div>
 												</div>
-											)}
-									</div>
-								))}
-							</div>
-
-							<div className="mt-10">
-								<div className="text-sm font-medium text-gray-700 mb-2">
-									Assigner les couleurs
-								</div>
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-									{[
-										{
-											key: "background",
-											label: "Couleur de fond",
-										},
-										{
-											key: "text",
-											label: "Couleur du texte",
-										},
-										{
-											key: "primary",
-											label: "Couleur principale",
-										},
-										{
-											key: "accent",
-											label: "Couleur d'accent",
-										},
-										{
-											key: "title",
-											label: "Couleur du titre",
-										},
-										{
-											key: "secondary",
-											label: "Couleur secondaire",
-										},
-									].map((r) => (
-										<div
-											key={r.key}
-											className="flex items-center gap-3 p-2 rounded border border-gray-300"
-										>
-											<div
-												className="w-10 h-10 rounded-sm"
-												style={{
-													background:
-														(companyTheme &&
-															(
-																companyTheme as any
-															)[r.key]) ||
-														Object.values(
-															companyColors
-														)[0],
-													border: "1px solid rgba(0,0,0,0.06)",
-												}}
-											/>
-											<div className="flex-1">
-												<div className="text-xs text-gray-600">
-													{r.label}
-												</div>
-												<div className="flex flex-col gap-2 mt-1">
-													<select
-														className="border rounded px-2 py-1 text-sm border-gray-300"
-														value={
-															(companyTheme &&
-																(
-																	companyTheme as any
-																)[r.key]) ||
-															""
-														}
-														onChange={(e) => {
-															const hex =
-																e.target
-																	.value ||
-																"";
-															setCompanyTheme(
-																(prev) => ({
-																	...(prev ||
-																		{}),
-																	[r.key]:
-																		hex,
-																})
-															);
-														}}
-													>
-														<option value="">
-															Choisir depuis la
-															palette
-														</option>
-														{Object.entries(
-															companyColors
-														).map(([k, v]) => (
-															<option
-																key={k}
-																value={v}
-															>
-																{k} — {v}
-															</option>
-														))}
-													</select>
-													<div className="flex items-center gap-2">
-														<input
-															type="color"
-															value={
-																((companyTheme &&
-																	(
-																		companyTheme as any
-																	)[
-																		r.key
-																	]) as string) ||
-																Object.values(
-																	companyColors
-																)[0] ||
-																"#000000"
-															}
-															onChange={(e) =>
-																setCompanyTheme(
-																	(prev) => ({
-																		...(prev ||
-																			{}),
-																		[r.key]:
-																			e
-																				.target
-																				.value,
-																	})
-																)
-															}
-															className="w-10 h-8 p-0 border rounded cursor-pointer border-gray-300"
-															title="Sélectionner une couleur"
-														/>
-														<input
-															className="font-mono text-sm border rounded px-2 py-1 border-gray-300 w-full"
-															value={
-																((companyTheme &&
-																	(
-																		companyTheme as any
-																	)[
-																		r.key
-																	]) as string) ||
-																""
-															}
-															onChange={(e) =>
-																setCompanyTheme(
-																	(prev) => ({
-																		...(prev ||
-																			{}),
-																		[r.key]:
-																			e
-																				.target
-																				.value,
-																	})
-																)
-															}
-															placeholder="#rrggbb"
-														/>
-													</div>
-												</div>
-											</div>
+											))}
 										</div>
-									))}
+									</div>
 								</div>
-							</div>
+							)}
 						</div>
 					)}
+
 					<div className="mt-4">
 						{(() => {
 							const isEditing = !!companyId;

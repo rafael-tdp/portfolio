@@ -23,6 +23,8 @@ export default function LogoColorPicker({
 	const [, setFile] = useState<File | null>(null);
 	const [picked, setPicked] = useState<string | null>(null);
 	const [objectUrl, setObjectUrl] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(!!initialUrl);
+	const [error, setError] = useState<string | null>(null);
 	const imgRef = useRef<HTMLImageElement | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -71,41 +73,61 @@ export default function LogoColorPicker({
 
 	// support initialUrl (e.g., already uploaded logo)
 	useEffect(() => {
-		if (!initialUrl) return;
+		if (!initialUrl) {
+			setIsLoading(false);
+			return;
+		}
 
-		// If initialUrl is cross-origin, try to fetch as a blob and create an object URL
-		const tryFetchBlob = async () => {
+		setIsLoading(true);
+		setError(null);
+
+		// Always fetch as blob to avoid CORS issues with canvas
+		const fetchAsBlob = async () => {
 			try {
-				const urlObj = new URL(initialUrl, window.location.href);
-				if (urlObj.origin !== window.location.origin) {
-					const res = await fetch(initialUrl, { mode: "cors" });
-					if (!res.ok) throw new Error("fetch failed");
-					const blob = await res.blob();
-					const obj = URL.createObjectURL(blob);
-					setObjectUrl(obj);
-					setFileUrl(obj);
-					onFileChange?.(null, initialUrl);
-					return;
-				}
-			} catch (err) {
-				// fallback to using the provided URL directly
 				// eslint-disable-next-line no-console
-				console.warn(
-					"[LogoColorPicker] fetch-as-blob failed, falling back to url",
-					err
-				);
+				console.debug("[LogoColorPicker] fetching initialUrl as blob:", initialUrl);
+				
+				// Use proxy for GCS URLs to avoid CORS issues
+				let fetchUrl = initialUrl;
+				if (initialUrl.includes('storage.googleapis.com')) {
+					const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3333';
+					fetchUrl = `${backendUrl}/api/proxy-image?url=${encodeURIComponent(initialUrl)}`;
+					// eslint-disable-next-line no-console
+					console.debug("[LogoColorPicker] using proxy URL:", fetchUrl);
+				}
+				
+				const res = await fetch(fetchUrl, { mode: "cors" });
+				if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+				const blob = await res.blob();
+				const obj = URL.createObjectURL(blob);
+				
+				// Revoke previous objectUrl if exists
+				if (objectUrl) {
+					URL.revokeObjectURL(objectUrl);
+				}
+				
+				setObjectUrl(obj);
+				setFileUrl(obj);
+				setIsLoading(false);
+				onFileChange?.(null, initialUrl);
+				// eslint-disable-next-line no-console
+				console.debug("[LogoColorPicker] blob URL created:", obj);
+			} catch (err) {
+				// eslint-disable-next-line no-console
+				console.warn("[LogoColorPicker] fetch-as-blob failed:", err);
+				setError("Impossible de charger l'image. Vérifiez que l'image est accessible.");
+				setIsLoading(false);
+				// Fallback: try using the URL directly (may not work for color picking due to CORS)
+				setFileUrl(initialUrl);
+				onFileChange?.(null, initialUrl);
 			}
-
-			setFileUrl(initialUrl);
-			onFileChange?.(null, initialUrl);
 		};
 
-		tryFetchBlob();
+		fetchAsBlob();
 
 		return () => {
 			if (objectUrl) {
 				URL.revokeObjectURL(objectUrl);
-				setObjectUrl(null);
 			}
 		};
 	}, [initialUrl]);
@@ -187,7 +209,11 @@ export default function LogoColorPicker({
 				</div>
 			)}
 
-			{fileUrl ? (
+			{isLoading ? (
+				<div className="text-sm text-gray-500">Chargement du logo...</div>
+			) : error ? (
+				<div className="text-sm text-red-500">{error}</div>
+			) : fileUrl ? (
 				<div className="flex gap-4 items-start">
 					<div>
 						<img
@@ -198,6 +224,11 @@ export default function LogoColorPicker({
 							style={{ maxWidth: 240, cursor: "crosshair" }}
 							onClick={handleClickImage}
 						/>
+						{pipetteMode && (
+							<div className="mt-2 text-xs text-gray-500">
+								Cliquez sur l&apos;image pour prélever une couleur
+							</div>
+						)}
 					</div>
 					{!pipetteMode ? (
 						<div>
