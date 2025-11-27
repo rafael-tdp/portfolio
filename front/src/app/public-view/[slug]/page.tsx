@@ -267,7 +267,7 @@ export default async function Page({ params }: Props) {
 					<div className="mb-12 text-base text-gray-700 leading-relaxed">
 						<p>
 							Merci de prendre le temps de consulter ma candidature pour le poste de{" "}
-							<span className="font-semibold" style={{ color: themeFinal.primary }}>
+							<span className="font-semibold" style={{ color: themeFinal.secondary }}>
 								{application?.jobTitle || "—"}
 							</span>.
 						</p>

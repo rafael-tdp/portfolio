@@ -143,7 +143,7 @@ function ApplicationsContent() {
 								className="bg-white p-4 rounded shadow-sm flex flex-col gap-3 cursor-pointer"
 								onClick={() =>
 									window.open(
-										`/${a.company?.publicSlug}`,
+										`/${a.company?.publicSlug}?preview=true`,
 										"_blank"
 									)
 								}
@@ -243,7 +243,7 @@ function ApplicationsContent() {
 														className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-600"
 														onClick={() =>
 															window.open(
-																`/${a.company?.publicSlug}`,
+																`/${a.company?.publicSlug}?preview=true`,
 																"_blank"
 															)
 														}

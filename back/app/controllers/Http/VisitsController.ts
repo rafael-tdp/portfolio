@@ -31,15 +31,22 @@ export default class VisitsController {
     }
 
     // Extract visitor info from request
-    const ip = request.ip?.() || request.header?.('x-forwarded-for') || request.header?.('x-real-ip') || 'unknown'
-    const userAgent = request.header?.('user-agent') || ''
-    const referer = request.header?.('referer') || ''
+    const ipRaw = request.header('x-forwarded-for') || request.header('x-real-ip') || request.ip() || 'unknown'
+    const ip = typeof ipRaw === 'string' ? ipRaw.split(',')[0].trim() : 'unknown'
+    const userAgent = request.header('user-agent') || ''
+    const referer = request.header('referer') || ''
+
+    // Ignore localhost visits (local development)
+    const localhostIps = ['::1', '127.0.0.1', 'localhost', '::ffff:127.0.0.1']
+    if (localhostIps.includes(ip)) {
+      return response.ok({ success: true, skipped: true, reason: 'localhost' })
+    }
 
     // Create visit record
     const visit = await Visit.create({
       application: (application as any)._id,
       company: companyId,
-      ip: typeof ip === 'function' ? ip() : ip,
+      ip,
       userAgent,
       referer,
     })
@@ -57,8 +64,15 @@ export default class VisitsController {
       return response.unauthorized({ error: 'Authentication required' })
     }
 
-    // Get all applications for this user
-    const applications = await Application.find({ user: user._id }).lean()
+    // Get all applications for this user (or all if none are linked)
+    let applications = await Application.find({ user: user._id }).lean()
+    
+    // Fallback: if no applications are linked to user, get all applications
+    // This handles legacy data where user wasn't set
+    if (applications.length === 0) {
+      applications = await Application.find({}).lean()
+    }
+    
     const appIds = applications.map((a: any) => a._id)
 
     if (appIds.length === 0) {
@@ -144,6 +158,24 @@ export default class VisitsController {
       visits,
       totalVisits,
       uniqueVisitors: uniqueIps.length,
+    })
+  }
+
+  /**
+   * Delete all visits.
+   * DELETE /api/visits/all
+   */
+  public async deleteAll({ request, response }: HttpContextContract) {
+    const user = (request as any).user
+    if (!user) {
+      return response.unauthorized({ error: 'Authentication required' })
+    }
+
+    const result = await Visit.deleteMany({})
+    
+    return response.ok({
+      success: true,
+      deletedCount: result.deletedCount,
     })
   }
 }

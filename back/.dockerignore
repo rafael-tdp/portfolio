@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build output (we copy it explicitly)
+# build/
+
+# Development files
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
+
+# Documentation
+README.md
+docs/
+
+# Misc
+*.log
+.DS_Store
+tmp/

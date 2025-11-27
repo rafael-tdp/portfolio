@@ -190,6 +190,7 @@ router.get('/public/:slug', handler('#controllers/Http/PublicController.js', 'sh
 router.post('/api/visits/track', handler('#controllers/Http/VisitsController.js', 'track'))
 router.get('/api/visits/stats', handler('#controllers/Http/VisitsController.js', 'stats', { auth: true }))
 router.get('/api/visits/application/:id', handler('#controllers/Http/VisitsController.js', 'byApplication', { auth: true }))
+router.delete('/api/visits/all', handler('#controllers/Http/VisitsController.js', 'deleteAll', { auth: true }))
 
 // PDF generation
 router.post('/api/pdf/generate', handler('#controllers/Http/PdfController.js', 'generatePdf'))
