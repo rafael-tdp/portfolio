@@ -52,4 +52,4 @@ jobs:
             --timeout 300 \
             --min-instances 0 \
             --max-instances 2 \
-            --set-env-vars "NODE_ENV=production,HOST=0.0.0.0,PORT=8080,TZ=Europe/Paris,LOG_LEVEL=info,APP_KEY=${{ secrets.APP_KEY }},MONGO_URI=${{ secrets.MONGO_URI }},GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},FRONTEND_URL=https://rafael-tavares.vercel.app,GCS_PROJECT_ID=portfolio-479513,GCS_BUCKET_NAME=rafaeltavares-bucket"
+            --set-env-vars "NODE_ENV=production,HOST=0.0.0.0,TZ=Europe/Paris,LOG_LEVEL=info,APP_KEY=${{ secrets.APP_KEY }},MONGO_URI=${{ secrets.MONGO_URI }},GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},FRONTEND_URL=https://rafael-tavares.vercel.app,GCS_PROJECT_ID=portfolio-479513,GCS_BUCKET_NAME=rafaeltavares-bucket"
