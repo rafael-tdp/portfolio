@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-3xs: 0.625rem; /* 10px */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+[data-theme="dark"] #about strong {
+  color: #ffffff;
+}
+
+body {
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden;
+  /* default (non-home) background: keep pages light unless explicitly scoped to home */
+  @apply bg-white text-gray-800;
+}
+[data-theme="dark"] #about strong {
+  color: #ffffff;
+}
+[data-page="home"] {
+  /* when visiting the homepage we apply the overall background/text palette */
+  @apply bg-slate-50 text-slate-700;
+}
+
+[data-theme="dark"] [data-page="home"] {
+  @apply bg-slate-950 text-slate-400;
+}
+[data-theme="dark"] #about strong {
+  color: #ffffff;
+}
+
+#about Strong {
+  /* indigo-700 */
+  color: #4f46e5;
+}
+
+@layer components {
+  /* Apply custom scrollbar only when body has data-page="home" */
+  body[data-page="home"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  body[data-page="home"] ::-webkit-scrollbar-track {
+    background-color: #ffffff;
+  }
+
+  body[data-page="home"] ::-webkit-scrollbar-thumb {
+    background-color: #6459f0;
+    border-radius: 10px;
+  }
+
+  body[data-page="home"][data-theme="dark"] ::-webkit-scrollbar-track {
+    background-color: #1e293b; /* slate-900 */
+  }
+
+  body[data-page="home"][data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: #6459f0;
+  }
+
+  body[data-page="home"] ::-webkit-scrollbar-vertical {
+    width: 12px;
+  }
+
+  body[data-page="home"] ::-webkit-scrollbar-horizontal {
+    height: 12px;
+  }
+}
