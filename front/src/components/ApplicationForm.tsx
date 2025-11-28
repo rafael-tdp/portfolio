@@ -287,11 +287,11 @@ export default function ApplicationForm({
 	}
 
 	async function generateCover() {
-		if (!companyId || !jobDescription)
-			return toast.error("Entreprise et description requises");
+		if (!companyId)
+			return toast.error("Entreprise requise");
 		setLoading(true);
 		try {
-			// Generate cover letter only
+			// Generate cover letter only (spontaneous if no jobDescription)
 			const coverJson = await api.generateCover({
 				userId: null,
 				companyId,
@@ -304,7 +304,10 @@ export default function ApplicationForm({
 			});
 			
 			setCoverLetter(coverJson.coverLetter || "");
-			toast.success("Lettre de motivation générée - vérifiez et enregistrez");
+			const message = jobDescription 
+				? "Lettre de motivation générée - vérifiez et enregistrez"
+				: "Candidature spontanée générée - vérifiez et enregistrez";
+			toast.success(message);
 		} catch (err) {
 			toast.error((err as Error).message || String(err));
 		} finally {
@@ -687,9 +690,9 @@ export default function ApplicationForm({
 					</div>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
 					<FormSectionTitle className="mb-3">
-						3. Lettre de motivation
+						3. La Lettre de Motivation	
 					</FormSectionTitle>
 					<TextField
 						id="cover-letter"
@@ -702,7 +705,7 @@ export default function ApplicationForm({
 					/>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
 					<FormSectionTitle className="mb-3">
 						4. Le CV - Soft Skills
 					</FormSectionTitle>
@@ -728,7 +731,7 @@ export default function ApplicationForm({
 						<div className="space-y-2">
 							{softSkills.map((skill, index) => (
 								<div key={index} className="flex items-center gap-2">
-									<span className="text-emerald-600 font-medium">•</span>
+									<span className="text-blue-500 font-medium">•</span>
 									<input
 										type="text"
 										value={skill}
@@ -737,7 +740,7 @@ export default function ApplicationForm({
 											newSkills[index] = e.target.value;
 											setSoftSkills(newSkills);
 										}}
-										className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+										className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none"
 									/>
 									<button
 										type="button"
@@ -745,10 +748,10 @@ export default function ApplicationForm({
 											const newSkills = softSkills.filter((_, i) => i !== index);
 											setSoftSkills(newSkills);
 										}}
-										className="text-red-500 hover:text-red-700 p-1"
+										className="text-red-500 hover:text-red-700 p-1 bg-red-100 rounded cursor-pointer text-xs"
 										title="Supprimer"
 									>
-										✕
+										<LuTrash />
 									</button>
 								</div>
 							))}
@@ -767,7 +770,7 @@ export default function ApplicationForm({
 					)}
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
 					<FormSectionTitle className="mb-3">
 						5. Le CV - Compétences techniques
 					</FormSectionTitle>

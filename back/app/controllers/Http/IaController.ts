@@ -25,8 +25,11 @@ export default class IaController {
       length = 300,
       saveApplication = false,
     } = request.all()
-    if (!companyId || !jobDescription)
-      return response.badRequest({ error: 'companyId and jobDescription are required' })
+    if (!companyId)
+      return response.badRequest({ error: 'companyId is required' })
+
+    // Determine if this is a spontaneous application (no job description)
+    const isSpontaneous = !jobDescription || jobDescription.trim() === ''
 
     // prefer authenticated user attached by verifyAuth middleware, fall back to userId if provided
     const authUser = (request as any).user || null
@@ -39,26 +42,81 @@ export default class IaController {
     const company = (await Company.findById(companyId).lean()) as any
     if (!company) return response.badRequest({ error: 'Invalid company' })
 
-    // build prompt
-    const prompt = `Rédige une lettre de motivation en français pour le poste "${jobTitle || 'poste non précisé'}" chez ${company.name}.\n\n
-    Informations candidat: Rafael Tavares De Pinho.\n\n
-    Description du poste:\n${jobDescription}\n\n
-    Consignes: 
-    Commence par "Madame, Monsieur,". Pas besoin de sujet, de date ou d'autres informations d'en-tête. Pas besoin non plus de signer la lettre.
-    Ton: ${tone}. 
-    Longueur: environ ${length} mots. 
-    Base-toi exclusivement sur ces informations, sans ajouter de faits non fournis et sans inventer de compétences ou d’expériences.
-    Je suis un récent diplômé de master en Ingénierie du Web avec 2 ans d'expérience en développement full-stack chez Ownest où j'ai travaillé avec Node.js (Express.js et NestJS), MongoDB, Jest et Vue.js.
-    J'ai aussi réalisé des projets personnels et étudiants utilisant d'autres technologies (voir ci-après).
-    La liste de mes compétences: 
-    Langages principaux: JavaScript / TypeScript, HTML / CSS, Sass, (PHP, Java, Go, Twig)
-    Cloud & DevOps: Git, GitHub Actions, Docker, AWS (EC2, PM2), GCS, Vercel / Heroku / Render
-    Méthodologies & Standards: Agile/SCRUM, API REST, CI/CD, TDD, GitFlow, Clean Code
-    Bases de données: PostgreSQL, MySQL, MongoDB
-    Front-end: Vue.js, React, Next.js, Tailwind CSS
-    Back-end: Node.js, NestJS, (Symfony, API Platform)
-    Tests: Jest, PHPUnit
-    Mobile: Android Studio, Flutter`
+    // build prompt - different for spontaneous vs targeted applications
+    const prompt = isSpontaneous ? `
+    Rédige une lettre de candidature spontanée en français pour l'entreprise ${company.name}${jobTitle ? ` pour un poste de ${jobTitle}` : ''}.
+
+    === Informations sur le candidat ===
+    Nom : Rafael Tavares De Pinho
+    Diplôme récemment obtenu: Master en Ingénierie du Web
+    Expérience : 2 ans en développement full-stack dans la startup Ownest en alternance.
+    Technologies utilisées chez Ownest : Node.js (Express.js, NestJS), MongoDB, Jest, Vue.js
+    Projets personnels et étudiants : divers projets supplémentaires utilisant d'autres technologies (détaillés ci-dessous)
+
+    Compétences techniques :
+    - Langages : JavaScript / TypeScript, HTML / CSS, Sass, PHP, Java, Go, Twig
+    - Cloud & DevOps : Git, GitHub Actions, Docker, AWS (EC2, PM2), GCS, Vercel / Heroku / Render
+    - Méthodologies & Standards : Agile / SCRUM, API REST, CI/CD, TDD, GitFlow, Clean Code
+    - Bases de données : PostgreSQL, MySQL, MongoDB
+    - Front-end : Vue.js, React, Next.js, Tailwind CSS
+    - Back-end : Node.js, NestJS, Symfony, API Platform
+    - Tests : Jest, PHPUnit
+    - Mobile : Android Studio, Flutter
+
+    === Points clés à mettre en avant pour cette candidature spontanée ===
+    - Capacité à créer un site web ou une application de A à Z (de la conception à la mise en production)
+    - Souci du détail et exigence pour la qualité du code (clean code, bonnes pratiques, tests)
+    - Aptitude à intervenir sur n'importe quel type de projet grâce à une grande capacité d'adaptation
+    - Apprentissage rapide de nouvelles technologies et méthodologies
+    - Polyvalence full-stack permettant de comprendre et travailler sur l'ensemble de la stack technique
+
+    === Consignes rédactionnelles ===
+    - Commence impérativement par "Madame, Monsieur,".
+    - Ne mets pas de date, d'objet ou d'en-tête administratif.
+    - Ne signe pas la lettre à la fin.
+    - Longueur attendue : environ ${length} mots.
+    - Ton attendu : ${tone}.
+    - Ne pas inventer de faits, de compétences, d'expériences ou de formation inexistantes.
+    - Expliquer la motivation à rejoindre cette entreprise en particulier.
+    - Mettre en avant l'autonomie, la proactivité et la volonté de contribuer à des projets variés.
+
+    Génère maintenant la lettre conforme à ces instructions.`
+    : `
+    Rédige une lettre de motivation en français pour le poste de "${jobTitle || 'poste non précisé'}" chez ${company.name}.
+
+    === Informations sur le candidat ===
+    Nom : Rafael Tavares De Pinho
+    Diplôme récemment obtenu: Master en Ingénierie du Web
+    Expérience : 2 ans en développement full-stack dans la startup Ownest en alternance.
+    Technologies utilisées chez Ownest : Node.js (Express.js, NestJS), MongoDB, Jest, Vue.js
+    Projets personnels et étudiants : divers projets supplémentaires utilisant d'autres technologies (détaillés ci-dessous)
+
+    Compétences techniques :
+    - Langages : JavaScript / TypeScript, HTML / CSS, Sass, PHP, Java, Go, Twig
+    - Cloud & DevOps : Git, GitHub Actions, Docker, AWS (EC2, PM2), GCS, Vercel / Heroku / Render
+    - Méthodologies & Standards : Agile / SCRUM, API REST, CI/CD, TDD, GitFlow, Clean Code
+    - Bases de données : PostgreSQL, MySQL, MongoDB
+    - Front-end : Vue.js, React, Next.js, Tailwind CSS
+    - Back-end : Node.js, NestJS, Symfony, API Platform
+    - Tests : Jest, PHPUnit
+    - Mobile : Android Studio, Flutter
+
+    === Informations sur l’offre ===
+    ${jobDescription}
+
+    === Consignes rédactionnelles ===
+    - Commence impérativement par "Madame, Monsieur,".
+    - Ne mets pas de date, d’objet ou d’en-tête administratif.
+    - Ne signe pas la lettre à la fin.
+    - Longueur attendue : environ ${length} mots.
+    - Ton attendu : ${tone}.
+    - Ne pas inventer de faits, de compétences, d’expériences ou de formation inexistantes.
+    - Tout ce qui n’est pas explicitement donné doit être ignoré ou reformulé prudemment.
+    - Si l’offre demande des compétences ou expériences que Rafael ne possède pas, insister sur sa motivation, sa capacité d’apprentissage rapide et son potentiel d’évolution.
+    - Adapter le discours à l'entreprise et au poste en se basant uniquement sur les informations fournies.
+
+    Génère maintenant la lettre conforme à ces instructions.`;
+
     try {
       if (!GOOGLE_API_KEY) {
         // fallback: simple template
