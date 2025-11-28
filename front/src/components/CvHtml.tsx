@@ -220,7 +220,7 @@ export default function CvHtml({
 
 				{/* Company logo as faint background on the right side of the header */}
 				{logoUrl ? (
-					<div className="absolute top-0 bottom-0 right-0 flex items-center pointer-events-none rounded-full overflow-hidden">
+					<div className="absolute top-0 bottom-0 right-0 flex items-center pointer-events-none overflow-hidden">
 						<img
 							src={logoUrl}
 							alt="logo"
