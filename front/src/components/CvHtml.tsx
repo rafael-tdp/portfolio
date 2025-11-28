@@ -95,6 +95,16 @@ function getLighterColor(color: string, amount: number): string {
 	return color;
 }
 
+// Adaptive title size based on text length
+function getAdaptiveTitleClass(text: string): string {
+	const length = text?.length || 0;
+	if (length <= 20) return "text-3xl"; // Very short: large
+	if (length <= 30) return "text-2xl"; // Short: medium-large
+	if (length <= 40) return "text-xl";  // Medium: normal
+	if (length <= 50) return "text-lg";  // Long: smaller
+	return "text-base";                   // Very long: smallest
+}
+
 export default function CvHtml({
 	data,
 	theme,
@@ -195,7 +205,7 @@ export default function CvHtml({
 					>
 						{d.name}
 					</h2>
-					<h1 className="text-2xl font-semibold tracking-wide uppercase z-10">
+					<h1 className={`${getAdaptiveTitleClass(jobTitle || d.title || "")} font-semibold tracking-wide uppercase z-10`}>
 						{jobTitle || d.title}
 					</h1>
 					<h3
@@ -210,7 +220,7 @@ export default function CvHtml({
 
 				{/* Company logo as faint background on the right side of the header */}
 				{logoUrl ? (
-					<div className="absolute top-0 bottom-0 right-1 flex items-center pointer-events-none rounded-full overflow-hidden">
+					<div className="absolute top-0 bottom-0 right-0 flex items-center pointer-events-none rounded-full overflow-hidden">
 						<img
 							src={logoUrl}
 							alt="logo"
