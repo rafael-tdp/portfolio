@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import * as api from "@/lib/api";
 
 type AuthGuardProps = {
   children: React.ReactNode;
@@ -22,11 +23,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // Verify token with backend
     (async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-        const res = await fetch(`${base}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) {
+        const user = await api.getMe();
+        if (!user) {
           localStorage.removeItem("token");
           setStatus("unauthenticated");
           router.replace("/auth/login");

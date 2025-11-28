@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import AuthGuard from "../../../components/AuthGuard";
 import Button from "@/components/Button";
+import * as api from "@/lib/api";
 
 type AppType = any;
 
@@ -42,27 +43,15 @@ function ApplicationsContent() {
 		const load = async () => {
 			setLoading(true);
 			try {
-				const t = localStorage.getItem("token");
-				const base = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-				
 				// Load applications
-				const res = await fetch(`${base}/api/applications`, {
-					headers: t ? { Authorization: `Bearer ${t}` } : undefined,
-				});
-				if (res.ok) {
-					const json = await res.json();
-					setApps(json.applications || json);
-				} else {
-					setApps([]);
-				}
+				const applications = await api.getApplications();
+				setApps(applications);
 
 				// Load visit stats
+				const t = localStorage.getItem("token");
 				if (t) {
-					const statsRes = await fetch(`${base}/api/visits/stats`, {
-						headers: { Authorization: `Bearer ${t}` },
-					});
-					if (statsRes.ok) {
-						const statsJson = await statsRes.json();
+					const statsJson = await api.getVisitStats();
+					if (statsJson) {
 						const statsMap: VisitStats = {};
 						(statsJson.applications || []).forEach((app: any) => {
 							statsMap[app.applicationId] = {
@@ -88,7 +77,7 @@ function ApplicationsContent() {
 		if (!url) return null;
 		if (url.startsWith("http")) return url;
 		const base =
-			process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
+			process.env.NEXT_PUBLIC_BACKEND_URL;
 		return `${base}${url}`;
 	}
 
@@ -99,22 +88,7 @@ function ApplicationsContent() {
 			"Supprimer également le logo de l'entreprise associé à cette candidature ?"
 		);
 		try {
-			const t = localStorage.getItem("token");
-			const res = await fetch(
-				`${
-					process.env.NEXT_PUBLIC_BACKEND_URL ||
-					"http://localhost:3333"
-				}/api/applications/${a._id}`,
-				{
-					method: "DELETE",
-					headers: {
-						Authorization: `Bearer ${t}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ deleteCompanyLogo: delLogo }),
-				}
-			);
-			if (!res.ok) throw new Error("Échec suppression");
+			await api.deleteApplication(a._id, delLogo);
 			setApps((prev) => (prev || []).filter((x) => x._id !== a._id));
 		} catch (err) {
 			alert("Impossible de supprimer: " + String(err));
@@ -123,23 +97,7 @@ function ApplicationsContent() {
 
 	const saveEdit = async (a: AppType) => {
 		try {
-			const t = localStorage.getItem("token");
-			const res = await fetch(
-				`${
-					process.env.NEXT_PUBLIC_BACKEND_URL ||
-					"http://localhost:3333"
-				}/api/applications/${a._id}`,
-				{
-					method: "PATCH",
-					headers: {
-						Authorization: `Bearer ${t}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(editData),
-				}
-			);
-			if (!res.ok) throw new Error("Échec mise à jour");
-			const json = await res.json();
+			const json = await api.saveApplication(editData, a._id);
 			setApps((prev) =>
 				(prev || []).map((x) =>
 					x._id === a._id ? { ...x, ...json.application } : x

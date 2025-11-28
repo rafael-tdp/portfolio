@@ -8,6 +8,7 @@ import cvSample from "../../../data/cvSample";
 import CollapsibleSection from "../../../components/CollapsibleSection";
 import DownloadButtons from "../../../components/DownloadButtons";
 import { GoLink } from "react-icons/go";
+import * as api from "@/lib/api";
 
 interface Props {
 	params: { slug: string };
@@ -17,16 +18,10 @@ export default async function Page({ params }: Props) {
 	// Some Next runtimes provide `params` as a thenable — await it first.
 	const resolvedParams = (await params) as { slug: string };
 	const slug = resolvedParams.slug;
-	const BACKEND =
-		process.env.BACKEND_URL ??
-		process.env.NEXT_PUBLIC_BACKEND_URL ??
-		"http://localhost:3333";
-	const base = BACKEND.replace(/\/+$/, "");
-	const res = await fetch(`${base}/public/${encodeURIComponent(slug)}`, {
-		cache: "no-store",
-	});
-	if (!res.ok) return notFound();
-	const json = await res.json();
+	
+	const json = await api.getPublicApplication(slug);
+	if (!json) return notFound();
+	
 	const company = json.company;
 	const application = json.application;
 	if (!company) return notFound();
@@ -166,7 +161,7 @@ export default async function Page({ params }: Props) {
 
 	// Compute a resolved logo URL to pass to client components (absolute when possible)
 	const FRONTEND_ASSET_BASE =
-		process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
+		process.env.NEXT_PUBLIC_BACKEND_URL;
 	let logoSrc: string | null = null;
 	if (company?.logoUrl) {
 		const logo = company.logoUrl;
@@ -214,23 +209,15 @@ export default async function Page({ params }: Props) {
 	} else if (application?.jobDescription) {
 		// Generate soft skills via AI if not stored but job description exists
 		try {
-			const softSkillsRes = await fetch(`${base}/api/ia/generate-soft-skills`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					jobTitle: application?.jobTitle,
-					jobDescription: application?.jobDescription,
-				}),
-				cache: 'force-cache', // Cache the result for this job description
-			});
-			if (softSkillsRes.ok) {
-				const softSkillsData = await softSkillsRes.json();
-				if (softSkillsData.softSkills && Array.isArray(softSkillsData.softSkills)) {
-					adaptedCvData = {
-						...adaptedCvData,
-						softSkills: softSkillsData.softSkills,
-					};
-				}
+			const softSkillsData = await api.serverGenerateSoftSkills(
+				application?.jobTitle,
+				application?.jobDescription
+			);
+			if (softSkillsData?.softSkills && Array.isArray(softSkillsData.softSkills)) {
+				adaptedCvData = {
+					...adaptedCvData,
+					softSkills: softSkillsData.softSkills,
+				};
 			}
 		} catch (err) {
 			console.warn('Failed to generate adapted soft skills:', err);
@@ -256,8 +243,7 @@ export default async function Page({ params }: Props) {
 							{company?.logoUrl ? (
 								(() => {
 									const BACKEND =
-										process.env.NEXT_PUBLIC_BACKEND_URL ||
-										"http://localhost:3333";
+										process.env.NEXT_PUBLIC_BACKEND_URL;
 									const logo = company.logoUrl;
 									const src =
 										typeof logo === "string" &&

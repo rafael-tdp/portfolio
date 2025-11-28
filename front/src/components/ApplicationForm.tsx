@@ -123,7 +123,7 @@ export default function ApplicationForm({
 		if (!url) return null;
 		if (url.startsWith("http")) return url;
 		const base =
-			process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
+			process.env.NEXT_PUBLIC_BACKEND_URL;
 		return `${base}${url}`;
 	}
 

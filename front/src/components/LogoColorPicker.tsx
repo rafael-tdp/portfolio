@@ -90,7 +90,7 @@ export default function LogoColorPicker({
 				// Use proxy for GCS URLs to avoid CORS issues
 				let fetchUrl = initialUrl;
 				if (initialUrl.includes('storage.googleapis.com')) {
-					const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3333';
+					const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 					fetchUrl = `${backendUrl}/api/proxy-image?url=${encodeURIComponent(initialUrl)}`;
 					// eslint-disable-next-line no-console
 					console.debug("[LogoColorPicker] using proxy URL:", fetchUrl);

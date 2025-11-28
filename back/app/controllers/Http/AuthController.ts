@@ -5,7 +5,7 @@ import User from '../../mongodb/models/user.js'
 import env from '#start/env'
 
 const JWT_SECRET = env.get('APP_KEY') || 'change_me'
-const TOKEN_EXPIRY = '7d'
+const TOKEN_EXPIRY = '14d' // 2 weeks
 
 export default class AuthController {
   public async register({ request, response }: HttpContextContract) {

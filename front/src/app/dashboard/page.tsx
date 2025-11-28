@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import AuthGuard from "../../components/AuthGuard";
 import Button from "../../components/Button";
 import { LuEye, LuUsers, LuClock, LuLogOut } from "react-icons/lu";
+import * as api from "@/lib/api";
 
 export default function DashboardPage() {
   return (
@@ -46,13 +47,8 @@ function DashboardContent() {
     if (!t) return;
     (async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-        const res = await fetch(`${base}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${t}` },
-        });
-        if (!res.ok) return setUser(null);
-        const json = await res.json();
-        setUser(json.user || json.profile || json || null);
+        const user = await api.getMe();
+        setUser(user);
       } catch (err) {
         console.warn("Failed to load profile", err);
         setUser(null);
@@ -69,16 +65,8 @@ function DashboardContent() {
     }
     (async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-        const res = await fetch(`${base}/api/visits/stats`, {
-          headers: { Authorization: `Bearer ${t}` },
-        });
-        if (!res.ok) {
-          setVisitStats(null);
-          return;
-        }
-        const json = await res.json();
-        setVisitStats(json);
+        const stats = await api.getVisitStats();
+        setVisitStats(stats);
       } catch (err) {
         console.warn("Failed to load visit stats", err);
         setVisitStats(null);

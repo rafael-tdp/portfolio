@@ -7,6 +7,7 @@ import CvHtml from "./CvHtml";
 import CoverLetterHtml from "./CoverLetterHtml";
 import { Tailwind, compile } from "@fileforge/react-print";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import * as api from "@/lib/api";
 
 interface DownloadButtonsProps {
 	cvData: any;
@@ -52,22 +53,7 @@ export default function DownloadButtons({
 		filename: string,
 		title: string
 	): Promise<boolean> {
-		const BACKEND =
-			process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
-
-		const res = await fetch(`${BACKEND}/api/pdf/generate`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				html,
-				baseUrl: window.location.origin,
-				title,
-			}),
-		});
-
-		if (!res.ok) {
-			throw new Error(`PDF generation failed: ${res.status}`);
-		}
+		const res = await api.generatePdf(html, title);
 
 		const contentType = res.headers.get("content-type") || "";
 		let blob: Blob;
