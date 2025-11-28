@@ -291,26 +291,20 @@ export default function ApplicationForm({
 			return toast.error("Entreprise et description requises");
 		setLoading(true);
 		try {
-			// Generate cover letter and soft skills in parallel
-			const [coverJson, softSkillsJson] = await Promise.all([
-				api.generateCover({
-					userId: null,
-					companyId,
-					applicationId,
-					jobTitle,
-					jobDescription,
-					tone: "professionnel",
-					length: 300,
-					saveApplication: false,
-				}),
-				api.generateSoftSkills(jobTitle, jobDescription),
-			]);
+			// Generate cover letter only
+			const coverJson = await api.generateCover({
+				userId: null,
+				companyId,
+				applicationId,
+				jobTitle,
+				jobDescription,
+				tone: "professionnel",
+				length: 300,
+				saveApplication: false,
+			});
 			
 			setCoverLetter(coverJson.coverLetter || "");
-			if (softSkillsJson.softSkills && Array.isArray(softSkillsJson.softSkills)) {
-				setSoftSkills(softSkillsJson.softSkills);
-			}
-			toast.success("Lettre et soft skills générés - vérifiez et enregistrez");
+			toast.success("Lettre de motivation générée - vérifiez et enregistrez");
 		} catch (err) {
 			toast.error((err as Error).message || String(err));
 		} finally {
