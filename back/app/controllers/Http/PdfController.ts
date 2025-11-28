@@ -1,6 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import puppeteer from 'puppeteer'
 
+// Google Fonts to embed in PDF for consistent rendering across environments
+const GOOGLE_FONTS_CSS = `
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; }
+</style>
+`
+
 export default class PdfController {
   public async generatePdf({ request, response }: HttpContextContract) {
     const body = request.only(['slug', 'url', 'debug', 'html', 'baseUrl', 'title'])
@@ -44,12 +54,15 @@ export default class PdfController {
         const trimmed = fullHtml.trim().toLowerCase()
         if (!trimmed.startsWith('<!doctype') && !trimmed.startsWith('<html')) {
           // Ensure base tag so relative URLs resolve (images, fonts)
-          fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${pdfTitle}</title><base href="${baseUrl}"></head><body>${fullHtml}</body></html>`
+          fullHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${pdfTitle}</title><base href="${baseUrl}">${GOOGLE_FONTS_CSS}</head><body>${fullHtml}</body></html>`
+        } else {
+          // Inject Google Fonts into existing HTML head
+          fullHtml = fullHtml.replace(/<head([^>]*)>/i, `<head$1>${GOOGLE_FONTS_CSS}`)
         }
 
         // Set content and wait for DOM to be ready
         console.log('[PdfController] Setting HTML content...')
-        await page.setContent(fullHtml, { waitUntil: 'load', timeout: 60000 })
+        await page.setContent(fullHtml, { waitUntil: 'networkidle0', timeout: 60000 })
         console.log('[PdfController] Content loaded')
 
         // Wait for rendering to complete
