@@ -60,7 +60,7 @@ function formatCategoryName(category: string): string {
         backend: "Frameworks & Librairies Backend",
         mobile: "Mobile",
         database: "Bases de données",
-        cloud: "Cloud & Hébergement",
+        devops: "DevOps",
         tools: "Outils",
         testing: "Tests",
         methodologies: "Méthodologies",

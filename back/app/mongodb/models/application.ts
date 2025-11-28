@@ -6,6 +6,8 @@ export interface IApplication extends Document {
   jobTitle?: string
   jobDescription?: string
   requiredSkills?: string[]
+  softSkills?: string[]
+  hardSkills?: Record<string, string>
   coverLetter?: string
   coverLetterMeta?: Record<string, any>
   status?: string
@@ -20,6 +22,8 @@ const ApplicationSchema = new Schema<IApplication>(
     jobTitle: { type: String },
     jobDescription: { type: String },
     requiredSkills: { type: [String], default: [] },
+    softSkills: { type: [String], default: [] },
+    hardSkills: { type: Schema.Types.Mixed, default: {} },
     coverLetter: { type: String },
     coverLetterMeta: { type: Schema.Types.Mixed },
     status: { type: String, default: 'draft' },

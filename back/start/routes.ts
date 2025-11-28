@@ -182,6 +182,8 @@ router.post('/api/companies/:id/extract-colors', handler('#controllers/Http/Comp
 
 // IA generation
 router.post('/api/ia/generate-cover', handler('#controllers/Http/IaController.js', 'generateCover', { auth: true }))
+router.post('/api/ia/generate-soft-skills', handler('#controllers/Http/IaController.js', 'generateSoftSkills')) // Public - only generates generic soft skills
+router.post('/api/ia/generate-hard-skills', handler('#controllers/Http/IaController.js', 'generateHardSkills')) // Public - filters from known skills only
 
 // Public view
 router.get('/public/:slug', handler('#controllers/Http/PublicController.js', 'showCompany'))

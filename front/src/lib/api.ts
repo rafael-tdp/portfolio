@@ -120,3 +120,33 @@ export async function getApplication(applicationId: string) {
   if (!res.ok) throw new Error(json?.error || "Fetch failed")
   return json.application || json
 }
+
+export async function generateSoftSkills(jobTitle: string, jobDescription: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/ia/generate-soft-skills`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ jobTitle, jobDescription }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Generation failed")
+  return json
+}
+
+export async function generateHardSkills(jobTitle: string, jobDescription: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/ia/generate-hard-skills`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ jobTitle, jobDescription }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Generation failed")
+  return json
+}

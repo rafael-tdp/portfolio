@@ -179,6 +179,65 @@ export default async function Page({ params }: Props) {
 				  }`;
 	}
 
+	// Generate adapted soft skills using AI based on job description
+	let adaptedCvData = { ...cvSample };
+	
+	// Use hardSkills from application if they exist, otherwise keep default cvSample skills
+	// The new format stores hardSkills as Record<string, string> (same as cvSample.skills)
+	if (application?.hardSkills && typeof application.hardSkills === 'object' && Object.keys(application.hardSkills).length > 0) {
+		const hardSkillsObj = application.hardSkills as Record<string, string | string[]>;
+		const skills: Record<string, string> = {};
+		
+		for (const [category, skillsValue] of Object.entries(hardSkillsObj)) {
+			if (Array.isArray(skillsValue) && skillsValue.length > 0) {
+				// Old format: convert array to string
+				skills[category] = skillsValue.join(', ');
+			} else if (typeof skillsValue === 'string' && skillsValue.trim() !== '') {
+				// New format: use directly
+				skills[category] = skillsValue;
+			}
+		}
+		
+		// Use only the application's hardSkills (no merge with cvSample)
+		adaptedCvData = {
+			...adaptedCvData,
+			skills: skills as typeof cvSample.skills,
+		};
+	}
+	
+	// Use softSkills from application if they exist
+	if (application?.softSkills && Array.isArray(application.softSkills) && application.softSkills.length > 0) {
+		adaptedCvData = {
+			...adaptedCvData,
+			softSkills: application.softSkills,
+		};
+	} else if (application?.jobDescription) {
+		// Generate soft skills via AI if not stored but job description exists
+		try {
+			const softSkillsRes = await fetch(`${base}/api/ia/generate-soft-skills`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					jobTitle: application?.jobTitle,
+					jobDescription: application?.jobDescription,
+				}),
+				cache: 'force-cache', // Cache the result for this job description
+			});
+			if (softSkillsRes.ok) {
+				const softSkillsData = await softSkillsRes.json();
+				if (softSkillsData.softSkills && Array.isArray(softSkillsData.softSkills)) {
+					adaptedCvData = {
+						...adaptedCvData,
+						softSkills: softSkillsData.softSkills,
+					};
+				}
+			}
+		} catch (err) {
+			console.warn('Failed to generate adapted soft skills:', err);
+			// Keep default cvSample soft skills
+		}
+	}
+
 	return (
 		<div className="min-h-screen">
 			{/* Track visit when page loads */}
@@ -277,28 +336,26 @@ export default async function Page({ params }: Props) {
 						</p>
 					</div>
 
-					{/* Download & Portfolio Links */}
-					<div className="mb-10">
-						<DownloadButtons
-							cvData={cvSample}
-							coverLetterData={{
-								text: application?.coverLetter || "",
-								applicantName: application?.applicantName || cvSample.name,
-								date: new Date().toLocaleDateString(),
-								companyName: company?.name,
-								jobTitle: application?.jobTitle,
-								logoUrl: logoSrc,
-							}}
-							theme={themeFinal}
-							jobTitle={application?.jobTitle}
-							logoUrl={logoSrc ?? undefined}
-							companyName={company?.name}
-							applicantName={cvSample?.name}
-							portfolioUrl="/"
-						/>
-					</div>
-
-					{/* CV Section */}
+                    {/* Download & Portfolio Links */}
+                    <div className="mb-10">
+                        <DownloadButtons
+                            cvData={adaptedCvData}
+                            coverLetterData={{
+                                text: application?.coverLetter || "",
+                                applicantName: application?.applicantName || adaptedCvData.name,
+                                date: new Date().toLocaleDateString(),
+                                companyName: company?.name,
+                                jobTitle: application?.jobTitle,
+                                logoUrl: logoSrc,
+                            }}
+                            theme={themeFinal}
+                            jobTitle={application?.jobTitle}
+                            logoUrl={logoSrc ?? undefined}
+                            companyName={company?.name}
+                            applicantName={adaptedCvData?.name}
+                            portfolioUrl="/"
+                        />
+                    </div>					{/* CV Section */}
 					<CollapsibleSection
 						title="Mon CV"
 						defaultOpen={false}
@@ -306,7 +363,7 @@ export default async function Page({ params }: Props) {
 					>
 						<article className="p-6">
 							<CvViewer
-								data={cvSample}
+								data={adaptedCvData}
 								pdfSrc="cv.pdf"
 								showHtml
 								theme={themeFinal}
@@ -332,7 +389,7 @@ export default async function Page({ params }: Props) {
 										text: application?.coverLetter || "",
 										applicantName:
 											application?.applicantName ||
-											cvSample.name,
+											adaptedCvData.name,
 										date: new Date().toLocaleDateString(),
 										companyName: company?.name,
 										jobTitle: application?.jobTitle,

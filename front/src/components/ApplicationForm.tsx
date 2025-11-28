@@ -8,8 +8,9 @@ import FormSectionTitle from "../components/FormSectionTitle";
 import FormLabel from "../components/FormLabel";
 import TextField from "../components/TextField";
 import Button from "../components/Button";
-import { LuPipette, LuCopy } from "react-icons/lu";
+import { LuPipette, LuCopy, LuTrash, LuSparkles } from "react-icons/lu";
 import * as api from "../lib/api";
+import cvSample from "../data/cvSample";
 
 type InitialData = Partial<{
 	companyName: string;
@@ -21,6 +22,8 @@ type InitialData = Partial<{
 	jobTitle: string;
 	jobDescription: string;
 	coverLetter: string;
+	softSkills: string[];
+	hardSkills: Record<string, string>;
 	applicationId: string | null;
 }>;
 
@@ -66,6 +69,19 @@ export default function ApplicationForm({
 		initial.jobDescription || ""
 	);
 	const [coverLetter, setCoverLetter] = useState(initial.coverLetter || "");
+	// Use existing softSkills or default to cvSample.softSkills
+	const [softSkills, setSoftSkills] = useState<string[]>(
+		initial.softSkills && initial.softSkills.length > 0
+			? initial.softSkills
+			: cvSample.softSkills
+	);
+	// Use existing hardSkills or default to cvSample.skills
+	const [hardSkills, setHardSkills] = useState<Record<string, string>>(
+		initial.hardSkills && Object.keys(initial.hardSkills).length > 0 
+			? initial.hardSkills 
+			: cvSample.skills
+	);
+	const [generatingSoftSkills, setGeneratingSoftSkills] = useState(false);
 	const [companyId, setCompanyId] = useState<string | null>(
 		initial.companyId || null
 	);
@@ -275,23 +291,46 @@ export default function ApplicationForm({
 			return toast.error("Entreprise et description requises");
 		setLoading(true);
 		try {
-			const payload = {
-				userId: null,
-				companyId,
-				applicationId,
-				jobTitle,
-				jobDescription,
-				tone: "professionnel",
-				length: 300,
-				saveApplication: false,
-			};
-			const json = await api.generateCover(payload);
-			setCoverLetter(json.coverLetter || "");
-			toast.success("Lettre générée - vérifiez et enregistrez manuellement");
+			// Generate cover letter and soft skills in parallel
+			const [coverJson, softSkillsJson] = await Promise.all([
+				api.generateCover({
+					userId: null,
+					companyId,
+					applicationId,
+					jobTitle,
+					jobDescription,
+					tone: "professionnel",
+					length: 300,
+					saveApplication: false,
+				}),
+				api.generateSoftSkills(jobTitle, jobDescription),
+			]);
+			
+			setCoverLetter(coverJson.coverLetter || "");
+			if (softSkillsJson.softSkills && Array.isArray(softSkillsJson.softSkills)) {
+				setSoftSkills(softSkillsJson.softSkills);
+			}
+			toast.success("Lettre et soft skills générés - vérifiez et enregistrez");
 		} catch (err) {
 			toast.error((err as Error).message || String(err));
 		} finally {
 			setLoading(false);
+		}
+	}
+
+	async function generateSoftSkillsOnly() {
+		if (!jobDescription) return toast.error("Description du poste requise");
+		setGeneratingSoftSkills(true);
+		try {
+			const json = await api.generateSoftSkills(jobTitle, jobDescription);
+			if (json.softSkills && Array.isArray(json.softSkills)) {
+				setSoftSkills(json.softSkills);
+				toast.success("Soft skills générés");
+			}
+		} catch (err) {
+			toast.error((err as Error).message || String(err));
+		} finally {
+			setGeneratingSoftSkills(false);
 		}
 	}
 
@@ -306,6 +345,8 @@ export default function ApplicationForm({
 				jobDescription,
 				requiredSkills: [],
 				coverLetter,
+				softSkills,
+				hardSkills,
 			};
 			const json = await api.saveApplication(payload, applicationId);
 			if (applicationId) {
@@ -378,7 +419,7 @@ export default function ApplicationForm({
 								/>
 							</div>
 							<div className="mt-3 w-full">
-								<div className="text-sm text-gray-500">
+								<div className="text-xs text-gray-500">
 									Les couleurs sont prélevées automatiquement
 									lors de la sélection du logo — ou depuis le
 									logo existant lorsque vous editez une
@@ -644,8 +685,9 @@ export default function ApplicationForm({
 									loading || !companyId || !jobDescription
 								}
 								loading={loading}
+								icon={<LuSparkles />}
 							>
-								Générer la lettre (IA)
+								Générer la lettre
 							</Button>
 						</div>
 					</div>
@@ -664,6 +706,187 @@ export default function ApplicationForm({
 						value={coverLetter}
 						onChange={(e) => setCoverLetter(e.target.value)}
 					/>
+				</section>
+
+				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+					<FormSectionTitle className="mb-3">
+						4. Le CV - Soft Skills
+					</FormSectionTitle>
+					<p className="text-xs text-gray-500 mb-4">
+						Les soft skills sont générés automatiquement lors de la génération de la lettre de motivation, ou vous pouvez les générer/modifier manuellement.
+					</p>
+					
+					<div className="mb-4">
+						<Button
+							type="button"
+							variant="indigo"
+							onClick={generateSoftSkillsOnly}
+							disabled={generatingSoftSkills || !jobDescription}
+							loading={generatingSoftSkills}
+							className="text-sm"
+							icon={<LuSparkles />}
+						>
+							Régénérer les soft skills
+						</Button>
+					</div>
+
+					{softSkills.length > 0 ? (
+						<div className="space-y-2">
+							{softSkills.map((skill, index) => (
+								<div key={index} className="flex items-center gap-2">
+									<span className="text-emerald-600 font-medium">•</span>
+									<input
+										type="text"
+										value={skill}
+										onChange={(e) => {
+											const newSkills = [...softSkills];
+											newSkills[index] = e.target.value;
+											setSoftSkills(newSkills);
+										}}
+										className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+									/>
+									<button
+										type="button"
+										onClick={() => {
+											const newSkills = softSkills.filter((_, i) => i !== index);
+											setSoftSkills(newSkills);
+										}}
+										className="text-red-500 hover:text-red-700 p-1"
+										title="Supprimer"
+									>
+										✕
+									</button>
+								</div>
+							))}
+							<button
+								type="button"
+								onClick={() => setSoftSkills([...softSkills, ""])}
+								className="text-sm text-sky-600 hover:text-sky-700 mt-2"
+							>
+								+ Ajouter un soft skill
+							</button>
+						</div>
+					) : (
+						<div className="text-gray-400 text-sm italic">
+							Aucun soft skill généré. Cliquez sur &quot;Générer la lettre (IA)&quot; ou &quot;Régénérer les soft skills&quot; pour en générer.
+						</div>
+					)}
+				</section>
+
+				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+					<FormSectionTitle className="mb-3">
+						5. Le CV - Compétences techniques
+					</FormSectionTitle>
+					<p className="text-xs text-gray-500 mb-4">
+						Modifiez les compétences de chaque catégorie selon le poste visé.
+					</p>
+
+					{Object.keys(hardSkills).length > 0 ? (
+						<div className="space-y-4">
+							{(() => {
+								// Display labels for categories
+								const categoryLabels: Record<string, string> = {
+									languages: "Langages",
+									frontend: "Frontend",
+									backend: "Backend",
+									databases: "Bases de données",
+									tests: "Tests",
+									devops: "DevOps",
+									methodologies: "Méthodologies",
+									mobile: "Mobile",
+								};
+								
+								// Order categories in a logical way
+								const orderedKeys = ['languages', 'frontend', 'backend', 'databases', 'tests', 'devops', 'methodologies', 'mobile'];
+								const sortedEntries = Object.entries(hardSkills).sort(([a], [b]) => {
+									const aIndex = orderedKeys.indexOf(a);
+									const bIndex = orderedKeys.indexOf(b);
+									if (aIndex === -1 && bIndex === -1) return 0;
+									if (aIndex === -1) return 1;
+									if (bIndex === -1) return -1;
+									return aIndex - bIndex;
+								});
+								
+								// Get available categories that are not yet added
+								const availableCategories = orderedKeys.filter(key => !hardSkills[key]);
+								
+								return (
+									<>
+										{sortedEntries.map(([category, skillsString]) => (
+											<div key={category} className="border border-gray-200 rounded-lg p-4">
+												<div className="flex items-center justify-between mb-2">
+													<h4 className="font-medium text-gray-700 text-sm">
+														{categoryLabels[category] || category}
+													</h4>
+													<button
+														type="button"
+														onClick={() => {
+															const newHardSkills = { ...hardSkills };
+															delete newHardSkills[category];
+															setHardSkills(newHardSkills);
+														}}
+														className="text-xs text-red-500 hover:text-red-700 p-1 bg-red-100 rounded cursor-pointer"
+														title="Supprimer cette catégorie"
+													>
+														<LuTrash />
+													</button>
+												</div>
+												<input
+													type="text"
+													value={skillsString}
+													onChange={(e) => {
+														setHardSkills({
+															...hardSkills,
+															[category]: e.target.value,
+														});
+													}}
+													className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+													placeholder="Compétences séparées par des virgules..."
+												/>
+											</div>
+										))}
+										
+										{/* Add new category button */}
+										{availableCategories.length > 0 && (
+											<div className="border border-dashed border-gray-300 rounded-lg p-4">
+												<label className="block text-sm font-medium text-gray-600 mb-2">
+													Ajouter une catégorie
+												</label>
+												<select
+													onChange={(e) => {
+														const selectedCategory = e.target.value;
+														if (selectedCategory) {
+															setHardSkills({
+																...hardSkills,
+																[selectedCategory]: "",
+															});
+															e.target.value = "";
+														}
+													}}
+													className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+													defaultValue=""
+												>
+													<option value="" disabled>Choisir une catégorie...</option>
+													{availableCategories.map((key) => (
+														<option key={key} value={key}>
+															{categoryLabels[key] || key}
+														</option>
+													))}
+												</select>
+											</div>
+										)}
+									</>
+								);
+							})()}
+						</div>
+					) : (
+						<div className="text-gray-400 text-sm italic">
+							Aucune compétence technique générée. Cliquez sur &quot;Générer la lettre (IA)&quot; ou &quot;Régénérer les compétences&quot; pour en générer.
+						</div>
+					)}
+				</section>
+
+				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
 					<div className="mt-3">
 						<div>
 							<Button

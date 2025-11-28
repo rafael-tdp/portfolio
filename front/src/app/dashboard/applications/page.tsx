@@ -3,9 +3,19 @@
 import React, { useEffect, useState } from "react";
 import { CiMenuKebab } from "react-icons/ci";
 import { useRouter } from "next/navigation";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 import AuthGuard from "../../../components/AuthGuard";
+import Button from "@/components/Button";
 
 type AppType = any;
+
+type VisitStats = {
+	[applicationId: string]: {
+		totalVisits: number;
+		uniqueVisitors: number;
+		lastVisit: string | null;
+	};
+};
 
 export default function Page() {
 	return (
@@ -18,6 +28,7 @@ export default function Page() {
 function ApplicationsContent() {
 	const [apps, setApps] = useState<AppType[] | null>(null);
 	const [loading, setLoading] = useState(false);
+	const [visitStats, setVisitStats] = useState<VisitStats>({});
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editData, setEditData] = useState<{
 		jobTitle?: string;
@@ -32,22 +43,36 @@ function ApplicationsContent() {
 			setLoading(true);
 			try {
 				const t = localStorage.getItem("token");
-				const res = await fetch(
-					`${
-						process.env.NEXT_PUBLIC_BACKEND_URL ||
-						"http://localhost:3333"
-					}/api/applications`,
-					{
-						headers: t
-							? { Authorization: `Bearer ${t}` }
-							: undefined,
-					}
-				);
+				const base = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
+				
+				// Load applications
+				const res = await fetch(`${base}/api/applications`, {
+					headers: t ? { Authorization: `Bearer ${t}` } : undefined,
+				});
 				if (res.ok) {
 					const json = await res.json();
 					setApps(json.applications || json);
 				} else {
 					setApps([]);
+				}
+
+				// Load visit stats
+				if (t) {
+					const statsRes = await fetch(`${base}/api/visits/stats`, {
+						headers: { Authorization: `Bearer ${t}` },
+					});
+					if (statsRes.ok) {
+						const statsJson = await statsRes.json();
+						const statsMap: VisitStats = {};
+						(statsJson.applications || []).forEach((app: any) => {
+							statsMap[app.applicationId] = {
+								totalVisits: app.totalVisits,
+								uniqueVisitors: app.uniqueVisitors,
+								lastVisit: app.lastVisit,
+							};
+						});
+						setVisitStats(statsMap);
+					}
 				}
 			} catch (err) {
 				console.error(err);
@@ -129,14 +154,20 @@ function ApplicationsContent() {
 	return (
 		<div className="mx-auto p-6 bg-gray-50 min-h-screen">
 			<div className="max-w-3xl mx-auto">
-				<h2 className="text-2xl font-normal mb-4">Candidatures</h2>
+				<div className="flex items-center justify-between mb-8">
+					<h2 className="text-2xl font-normal">Candidatures</h2>
+					<Button
+						onClick={() => router.push("/dashboard/create")}
+					>
+						Nouvelle candidature
+					</Button>
+				</div>
 				{loading && <div>Chargement...</div>}
 				{!loading && (!apps || apps.length === 0) && (
 					<div>Aucune candidature trouvée.</div>
 				)}
 				<div className="grid grid-cols-1 gap-4">
 					{apps?.map((a: AppType) => {
-						const theme = a.company?.theme || {};
 						return (
 							<div
 								key={a._id}
@@ -188,32 +219,37 @@ function ApplicationsContent() {
 									</div>
 
 									<div className="flex items-center gap-4">
-										<div className="flex items-center gap-1">
-											{[
-													["primary", theme.primary],
-													["accent", theme.accent],
-													["secondary", theme.secondary],
-													[
-														"background",
-														theme.background,
-													],
-													["text", theme.text],
-												].map(([k, v]) => (
+										{/* Visit indicator */}
+										{(() => {
+											const stats = visitStats[a._id];
+											const hasVisits = stats && stats.totalVisits > 0;
+											return (
 												<div
-													key={String(k)}
-													className="w-6 h-6 rounded border border-gray-300"
-													style={{
-														background:
-															(v as string) ||
-															"transparent",
-														border: v
-															? undefined
-															: "1px solid #e5e7eb",
-													}}
-													title={String(k)}
-												/>
-											))}
-										</div>
+													className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+														hasVisits
+															? "bg-emerald-50 text-emerald-700"
+															: "bg-gray-100 text-gray-500"
+													}`}
+													title={
+														hasVisits
+															? `${stats.totalVisits} visite${stats.totalVisits > 1 ? "s" : ""} (${stats.uniqueVisitors} unique${stats.uniqueVisitors > 1 ? "s" : ""})`
+															: "Aucune visite"
+													}
+												>
+													{hasVisits ? (
+														<>
+															<LuEye className="w-3.5 h-3.5" />
+															<span>{stats.totalVisits}</span>
+														</>
+													) : (
+														<>
+															<LuEyeOff className="w-3.5 h-3.5" />
+															<span>0</span>
+														</>
+													)}
+												</div>
+											);
+										})()}
 
 										<div className="relative">
 											<button

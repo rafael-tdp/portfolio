@@ -27,10 +27,10 @@ type CVData = {
 	availability?: string;
 	languages?: Array<{ name?: string; level?: string }>;
 	interests?: string[];
-	strengths?: string;
+	softSkills?: string[];
 	skills?: {
-		mainLanguages?: string;
-		cloud?: string;
+		languages?: string;
+		devops?: string;
 		methodologies?: string;
 		databases?: string;
 		frontend?: string;
@@ -47,6 +47,9 @@ function SkillsSectionGroup({
 	title: string;
 	content?: string;
 }) {
+	// Don't render if content is empty or undefined
+	if (!content || content.trim() === '') return null;
+	
 	return (
 		<>
 			<div className="mt-3 font-semibold">{title}</div>
@@ -184,17 +187,17 @@ export default function CvHtml({
 					}}
 				/>
 				<div className="flex flex-col justify-center">
-					<h1
+					<h2
 						className="text-4xl z-10"
 						style={{
 							color: getLighterColor(theme?.background, 0.7),
 						}}
 					>
 						{d.name}
-					</h1>
-					<h2 className="text-2xl font-semibold tracking-wide uppercase z-10">
-						{jobTitle || d.title}
 					</h2>
+					<h1 className="text-2xl font-semibold tracking-wide uppercase z-10">
+						{jobTitle || d.title}
+					</h1>
 					<h3
 						className="text-base uppercase font-medium z-10"
 						style={{
@@ -285,15 +288,15 @@ export default function CvHtml({
 						<div className="mt-6">
 							<CvSectionTitle title="Compétences" />
 							<SkillsSectionGroup
-								title="Langages principaux"
-								content={d.skills?.mainLanguages}
+								title="Langages"
+								content={d.skills?.languages}
 							/>
 							<SkillsSectionGroup
-								title="Frontend"
+								title="Front-end"
 								content={d.skills?.frontend}
 							/>
 							<SkillsSectionGroup
-								title="Backend"
+								title="Back-end"
 								content={d.skills?.backend}
 							/>
 							<SkillsSectionGroup
@@ -305,8 +308,8 @@ export default function CvHtml({
 								content={d.skills?.tests}
 							/>
 							<SkillsSectionGroup
-								title="Cloud & DevOps"
-								content={d.skills?.cloud}
+								title="DevOps"
+								content={d.skills?.devops}
 							/>
 							<SkillsSectionGroup
 								title="Méthodologies"
@@ -319,9 +322,15 @@ export default function CvHtml({
 						</div>
 
 						<div className="mt-6">
-							<CvSectionTitle title="Atouts" />
-							<div className=" leading-relaxed whitespace-pre-line">
-								{d.strengths}
+							<CvSectionTitle title="Savoir-être" />
+							<div className="leading-relaxed whitespace-pre-line">
+								<ul className="list-disc list-inside">
+									{d.softSkills?.map(
+										(strength: string, i: number) => (
+											<li key={i}>{strength}</li>
+										)
+									)}
+								</ul>
 							</div>
 						</div>
 
@@ -353,7 +362,7 @@ export default function CvHtml({
 				{/* Right main area */}
 				<main className="w-auto p-8 pt-[13rem]">
 					<section className="mb-6">
-						<CvSectionTitle title="Expériences professionnelles" />
+						<CvSectionTitle title="Expérience professionnelle" />
 						<div className="space-y-5  text-gray-700">
 							{d.experiences?.map((ex: any, i: number) => (
 								<div key={i}>
@@ -390,7 +399,7 @@ export default function CvHtml({
 					</section>
 
 					<section className="mb-6">
-						<CvSectionTitle title="Formations" />
+						<CvSectionTitle title="Formation" />
 						<div className="mt-3 space-y-4 text-gray-700 text-[0.73rem]">
 							{d.formations?.map((f: any, i: number) => (
 								<div key={i}>

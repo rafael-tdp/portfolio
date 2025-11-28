@@ -30,6 +30,25 @@ function EditContent({ params: rawParams }: { params: any }) {
         if (!id) return;
         const app = await api.getApplication(id);
         if (!mounted) return;
+        
+        // Normalize hardSkills to the new format (Record<string, string>)
+        // Handles both old format (string[]) and new format (string)
+        const normalizeHardSkills = (hardSkills: Record<string, string | string[]> | undefined): Record<string, string> => {
+          if (!hardSkills || typeof hardSkills !== 'object') return {};
+          
+          const normalized: Record<string, string> = {};
+          for (const [category, skills] of Object.entries(hardSkills)) {
+            if (Array.isArray(skills)) {
+              // Old format: convert array to comma-separated string
+              normalized[category] = skills.join(', ');
+            } else if (typeof skills === 'string') {
+              // New format: keep as is
+              normalized[category] = skills;
+            }
+          }
+          return normalized;
+        };
+        
         // Map API shape to initial data expected by ApplicationForm
         const init = {
           companyName: app.company?.name || "",
@@ -41,6 +60,8 @@ function EditContent({ params: rawParams }: { params: any }) {
           jobTitle: app.jobTitle || "",
           jobDescription: app.jobDescription || "",
           coverLetter: app.coverLetter || "",
+          softSkills: app.softSkills || [],
+          hardSkills: normalizeHardSkills(app.hardSkills),
           applicationId: app._id || app.id || null,
         };
         setInitial(init);

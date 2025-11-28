@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
 
 export default class ApplicationsController {
   public async create({ request, response }: HttpContextContract) {
-    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter'])
+    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills'])
     // `company` is required; `user` is optional to allow anonymous submissions
     if (!body.company) return response.badRequest({ error: 'company is required' })
 
@@ -15,6 +15,8 @@ export default class ApplicationsController {
       jobTitle: body.jobTitle,
       jobDescription: body.jobDescription,
       requiredSkills: body.requiredSkills || [],
+      softSkills: body.softSkills || [],
+      hardSkills: body.hardSkills || {},
       coverLetter: body.coverLetter,
     } as any)
 
@@ -52,7 +54,7 @@ export default class ApplicationsController {
     if (!id) return response.badRequest({ error: 'id required' })
     if (!mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
 
-    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter'])
+    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills'])
 
     const updated = await Application.findByIdAndUpdate(id, { $set: body }, { new: true }).populate('company').populate('user').lean()
     if (!updated) return response.notFound({ error: 'Application not found' })
