@@ -231,75 +231,75 @@ export default async function Page({ params }: Props) {
 			<VisitTracker slug={slug} />
 			<main className="w-full mx-auto overflow-hidden">
 				{/* Hero: full-width colored header using company primary */}
-				<div
-					className="w-full"
-					style={{
-						background: themeFinal.background,
-						color: onPrimary,
-					}}
-				>
-					<div className="max-w-5xl mx-auto py-16 px-4 md:px-8 flex items-center gap-6">
-						<div className="flex items-center gap-4">
-							{company?.logoUrl ? (
-								(() => {
-									const BACKEND =
-										process.env.NEXT_PUBLIC_BACKEND_URL;
-									const logo = company.logoUrl;
-									const src =
-										typeof logo === "string" &&
-										(logo.startsWith("http://") ||
-											logo.startsWith("https://"))
-											? logo
-											: `${BACKEND}${
-													logo.startsWith("/")
-														? logo
-														: `/${logo}`
-											  }`;
-									return (
-										<img
-											src={src}
-											alt={company.name}
-											className="w-24 h-24 object-contain rounded-md bg-white/10 p-1"
-										/>
-									);
-								})()
-							) : (
-								<div
-									className="w-24 h-24 flex items-center justify-center rounded-md font-semibold text-2xl"
-									style={{
-										background: onPrimary,
-										color: themeFinal.primary,
-									}}
+<div
+						className="w-full"
+						style={{
+							background: themeFinal.background,
+							color: onPrimary,
+						}}
+					>
+						<div className="max-w-5xl mx-auto py-8 sm:py-12 md:py-16 px-4 md:px-8 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+							<div className="flex items-center gap-4">
+								{company?.logoUrl ? (
+									(() => {
+										const BACKEND =
+											process.env.NEXT_PUBLIC_BACKEND_URL;
+										const logo = company.logoUrl;
+										const src =
+											typeof logo === "string" &&
+											(logo.startsWith("http://") ||
+												logo.startsWith("https://"))
+												? logo
+												: `${BACKEND}${
+														logo.startsWith("/")
+															? logo
+															: `/${logo}`
+												  }`;
+										return (
+											<img
+												src={src}
+												alt={company.name}
+												className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain rounded-md bg-white/10 p-1"
+											/>
+										);
+									})()
+								) : (
+									<div
+										className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex items-center justify-center rounded-md font-semibold text-xl sm:text-2xl"
+										style={{
+											background: onPrimary,
+											color: themeFinal.primary,
+										}}
+									>
+										{company?.name?.charAt(0) || "?"}
+									</div>
+								)}
+							</div>
+							<div className="text-center sm:text-left">
+								<h1
+									className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold"
+									style={{ color: themeFinal.title }}
 								>
-									{company?.name?.charAt(0) || "?"}
-								</div>
-							)}
-						</div>
-						<div>
-							<h1
-								className="text-5xl md:text-4xl font-bold"
-								style={{ color: themeFinal.title }}
-							>
-								Bienvenue {company?.name}
-								<span className="text-5xl ml-3">👋</span>
-							</h1>
-							<p className="mt-2 text-lg opacity-90">
-								Candidature au poste de{" "}
-								<span className="font-semibold">
-									{application?.jobTitle || "—"}
-								</span>
-							</p>
-							{company?.tagline && (
-								<p className="mt-1 text-sm opacity-80">
-									{company.tagline}
+									Bienvenue {company?.name}
+									<span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl ml-2 sm:ml-3">👋</span>
+								</h1>
+								<p className="mt-2 text-sm sm:text-base md:text-lg opacity-90">
+									Candidature au poste de{" "}
+									<span className="font-semibold">
+										{application?.jobTitle || "—"}
+									</span>
 								</p>
-							)}
+								{company?.tagline && (
+									<p className="mt-1 text-xs sm:text-sm opacity-80">
+										{company.tagline}
+									</p>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div className="max-w-5xl mx-auto p-6 md:p-8">
-					<div className="mb-12 inline-flex items-center gap-2 text-sm text-gray-500">
+				<div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8">
+					<div className="mb-8 sm:mb-12 inline-flex items-center gap-2 text-xs sm:text-sm text-gray-500">
 						<GoLink size={14} />
 						<span>Lien de partage</span>
 						<CopySlugBadge
@@ -309,7 +309,7 @@ export default async function Page({ params }: Props) {
 						/>
 					</div>
 
-					<div className="mb-12 text-base text-gray-700 leading-relaxed">
+					<div className="mb-8 sm:mb-12 text-sm sm:text-base text-gray-700 leading-relaxed">
 						<p>
 							Merci de prendre le temps de consulter ma candidature pour le poste de{" "}
 							<span className="font-semibold" style={{ color: themeFinal.secondary }}>
@@ -323,7 +323,7 @@ export default async function Page({ params }: Props) {
 					</div>
 
                     {/* Download & Portfolio Links */}
-                    <div className="mb-10">
+                    <div className="mb-6 sm:mb-10">
                         <DownloadButtons
                             cvData={adaptedCvData}
                             coverLetterData={{
@@ -347,7 +347,7 @@ export default async function Page({ params }: Props) {
 						defaultOpen={false}
 						theme={themeFinal}
 					>
-						<article className="p-6">
+						<article className="p-3 sm:p-6">
 							<CvViewer
 								data={adaptedCvData}
 								pdfSrc="cv.pdf"
@@ -365,7 +365,7 @@ export default async function Page({ params }: Props) {
 						defaultOpen={false}
 						theme={themeFinal}
 					>
-						<article className="p-6">
+						<article className="p-3 sm:p-6">
 							{/* Use CoverLetterViewer to show/download the cover letter */}
 							{/* Import dynamically to avoid bundling issues with server components */}
 							{/* We'll render the viewer as a client component via a lazy dynamic import */}

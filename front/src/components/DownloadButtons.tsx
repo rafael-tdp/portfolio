@@ -183,11 +183,11 @@ export default function DownloadButtons({
 	}
 
 	return (
-		<div className="flex items-center gap-4 text-sm flex-wrap">
+		<div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm flex-wrap">
 			<button
 				onClick={handleDownloadAll}
 				disabled={downloadingAll || downloadingCv || downloadingLetter}
-				className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
+				className="flex items-center gap-1 sm:gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
 			>
 				{downloadingAll ? (
 					<AiOutlineLoading3Quarters className="animate-spin" />
@@ -195,7 +195,8 @@ export default function DownloadButtons({
 					<LuDownload size={14} />
 				)}
 				<span className="underline underline-offset-2">
-					Télécharger tout
+					<span className="hidden sm:inline">Télécharger tout</span>
+					<span className="sm:hidden">Tout</span>
 				</span>
 			</button>
 
@@ -204,7 +205,7 @@ export default function DownloadButtons({
 			<button
 				onClick={handleDownloadCv}
 				disabled={downloadingAll || downloadingCv || downloadingLetter}
-				className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
+				className="flex items-center gap-1 sm:gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
 			>
 				{downloadingCv ? (
 					<AiOutlineLoading3Quarters className="animate-spin" />
@@ -219,7 +220,7 @@ export default function DownloadButtons({
 			<button
 				onClick={handleDownloadLetter}
 				disabled={downloadingAll || downloadingCv || downloadingLetter}
-				className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
+				className="flex items-center gap-1 sm:gap-1.5 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
 			>
 				{downloadingLetter ? (
 					<AiOutlineLoading3Quarters className="animate-spin" />
@@ -235,11 +236,12 @@ export default function DownloadButtons({
 				href={portfolioUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors"
+				className="flex items-center gap-1 sm:gap-1.5 text-gray-500 hover:text-gray-700 transition-colors"
 			>
 				<LuExternalLink size={14} />
 				<span className="underline underline-offset-2">
-					Mon portfolio
+					<span className="hidden sm:inline">Mon portfolio</span>
+					<span className="sm:hidden">Portfolio</span>
 				</span>
 			</a>
 		</div>

@@ -12,6 +12,17 @@ import { LuPipette, LuCopy, LuTrash, LuSparkles } from "react-icons/lu";
 import * as api from "../lib/api";
 import cvSample from "../data/cvSample";
 
+// Application status options
+const STATUS_OPTIONS = [
+	{ value: 'draft', label: 'Brouillon', color: 'bg-gray-100 text-gray-700' },
+	{ value: 'sent', label: 'Envoyée', color: 'bg-blue-100 text-blue-700' },
+	{ value: 'interview', label: 'Entretien en cours', color: 'bg-yellow-100 text-yellow-700' },
+	{ value: 'offer', label: 'Offre reçue', color: 'bg-green-100 text-green-700' },
+	{ value: 'accepted', label: 'Acceptée', color: 'bg-green-200 text-green-800' },
+	{ value: 'rejected', label: 'Refusée', color: 'bg-red-100 text-red-700' },
+	{ value: 'withdrawn', label: 'Retirée', color: 'bg-gray-200 text-gray-600' },
+];
+
 type InitialData = Partial<{
 	companyName: string;
 	companyId: string;
@@ -25,6 +36,7 @@ type InitialData = Partial<{
 	softSkills: string[];
 	hardSkills: Record<string, string>;
 	applicationId: string | null;
+	status: string;
 }>;
 
 export default function ApplicationForm({
@@ -92,6 +104,7 @@ export default function ApplicationForm({
 	const [applicationId, setApplicationId] = useState<string | null>(
 		initial.applicationId || null
 	);
+	const [status, setStatus] = useState(initial.status || 'sent');
 	const [loading, setLoading] = useState(false);
 
 	// Helper to extract colors from theme if no colors are available
@@ -344,6 +357,7 @@ export default function ApplicationForm({
 				coverLetter,
 				softSkills,
 				hardSkills,
+				status,
 			};
 			const json = await api.saveApplication(payload, applicationId);
 			if (applicationId) {
@@ -382,17 +396,40 @@ export default function ApplicationForm({
 	}
 
 	return (
-		<div className="mx-auto p-6 bg-gray-50 min-h-screen">
+		<div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">
 			<div className="max-w-3xl mx-auto">
-				<h1 className="text-2xl font-normal mb-6">
-					{applicationId
-						? "Modifier la candidature"
-						: "Créer une candidature"}
-				</h1>
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
+					<h1 className="text-xl sm:text-2xl font-normal">
+						{applicationId
+							? "Modifier la candidature"
+							: "Créer une candidature"}
+					</h1>
+					
+					{/* Status selector */}
+					<div className="flex items-center gap-2">
+						<label htmlFor="status" className="text-sm text-gray-600">
+							Statut :
+						</label>
+						<select
+							id="status"
+							value={status}
+							onChange={(e) => setStatus(e.target.value)}
+							className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border-0 cursor-pointer focus:ring-2 focus:ring-sky-500 ${
+								STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-gray-100 text-gray-700'
+							}`}
+						>
+							{STATUS_OPTIONS.map((option) => (
+								<option key={option.value} value={option.value}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
 
 				{/* Sections copied from original page (company, job, cover letter) */}
-				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
-					<FormSectionTitle className="mb-8">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
+					<FormSectionTitle className="mb-6 sm:mb-8">
 						1. L&apos;entreprise
 					</FormSectionTitle>
 					<div className="flex flex-col gap-6">
@@ -484,7 +521,7 @@ export default function ApplicationForm({
 													</div>
 													<div className="flex items-center gap-2 mt-1">
 														<input
-															className="font-mono text-sm border rounded px-2 py-1 w-28 border-gray-300"
+															className="font-mono text-xs sm:text-sm border rounded px-2 py-1 w-20 sm:w-28 border-gray-300"
 															value={v}
 															onChange={(e) => {
 																const newHex = e.target.value;
@@ -511,7 +548,7 @@ export default function ApplicationForm({
 												</div>
 
 												{editingColorKey === k && (companyLogoUrl || logoPreviewUrl) && (
-													<div className="absolute z-50 right-0 top-0 w-80">
+													<div className="absolute z-50 right-0 top-0 w-64 sm:w-80">
 														<div className="p-3 rounded bg-white shadow-lg border border-gray-300">
 															<LogoColorPicker
 																pipetteMode={true}
@@ -651,7 +688,7 @@ export default function ApplicationForm({
 					</div>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
 					<FormSectionTitle className="mb-3">
 						2. Le poste
 					</FormSectionTitle>
@@ -690,7 +727,7 @@ export default function ApplicationForm({
 					</div>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
 					<FormSectionTitle className="mb-3">
 						3. La Lettre de Motivation	
 					</FormSectionTitle>
@@ -705,7 +742,7 @@ export default function ApplicationForm({
 					/>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
 					<FormSectionTitle className="mb-3">
 						4. Le CV - Soft Skills
 					</FormSectionTitle>
@@ -731,7 +768,7 @@ export default function ApplicationForm({
 						<div className="space-y-2">
 							{softSkills.map((skill, index) => (
 								<div key={index} className="flex items-center gap-2">
-									<span className="text-blue-500 font-medium">•</span>
+									<span className="text-blue-500 font-medium hidden sm:inline">•</span>
 									<input
 										type="text"
 										value={skill}
@@ -740,7 +777,7 @@ export default function ApplicationForm({
 											newSkills[index] = e.target.value;
 											setSoftSkills(newSkills);
 										}}
-										className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none"
+										className="flex-1 px-2 sm:px-3 py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none"
 									/>
 									<button
 										type="button"
@@ -770,7 +807,7 @@ export default function ApplicationForm({
 					)}
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-12">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
 					<FormSectionTitle className="mb-3">
 						5. Le CV - Compétences techniques
 					</FormSectionTitle>
@@ -810,9 +847,9 @@ export default function ApplicationForm({
 								return (
 									<>
 										{sortedEntries.map(([category, skillsString]) => (
-											<div key={category} className="border border-gray-200 rounded-lg p-4">
+											<div key={category} className="border border-gray-200 rounded-lg p-3 sm:p-4">
 												<div className="flex items-center justify-between mb-2">
-													<h4 className="font-medium text-gray-700 text-sm">
+													<h4 className="font-medium text-gray-700 text-xs sm:text-sm">
 														{categoryLabels[category] || category}
 													</h4>
 													<button
@@ -837,7 +874,7 @@ export default function ApplicationForm({
 															[category]: e.target.value,
 														});
 													}}
-													className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+													className="w-full px-2 sm:px-3 py-2 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
 													placeholder="Compétences séparées par des virgules..."
 												/>
 											</div>
@@ -883,7 +920,7 @@ export default function ApplicationForm({
 					)}
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-6 mb-6">
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-6">
 					<div className="mt-3">
 						<div>
 							<Button

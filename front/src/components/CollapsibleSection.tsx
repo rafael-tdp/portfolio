@@ -40,11 +40,11 @@ export default function CollapsibleSection({
 					onKeyDown={(e) => {
 						if (e.key === "Enter" || e.key === " ") setOpen(!open);
 					}}
-					className="flex items-center justify-between p-4 cursor-pointer select-none border-b"
+					className="flex items-center justify-between p-3 sm:p-4 cursor-pointer select-none border-b"
                     style={{ borderColor: hexToRgba(theme?.primary, 0.06) }}
 				>
 					<h2
-						className="text-lg font-medium"
+						className="text-base sm:text-lg font-medium"
 						style={{ color: theme?.primary }}
 					>
 						{title}
@@ -52,7 +52,7 @@ export default function CollapsibleSection({
 
 					<button
 						aria-expanded={open}
-						className={`w-9 h-9 flex items-center justify-center rounded-md text-lg`}
+						className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-md text-base sm:text-lg`}
                         style={{
                             background: hexToRgba(theme?.primary, 0.1),
                             color: theme?.primary,

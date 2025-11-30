@@ -26,7 +26,7 @@ const ApplicationSchema = new Schema<IApplication>(
     hardSkills: { type: Schema.Types.Mixed, default: {} },
     coverLetter: { type: String },
     coverLetterMeta: { type: Schema.Types.Mixed },
-    status: { type: String, default: 'draft' },
+    status: { type: String, default: 'sent' },
   },
   { timestamps: true }
 )

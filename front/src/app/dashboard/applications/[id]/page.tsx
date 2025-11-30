@@ -63,6 +63,7 @@ function EditContent({ params: rawParams }: { params: any }) {
           softSkills: app.softSkills || [],
           hardSkills: normalizeHardSkills(app.hardSkills),
           applicationId: app._id || app.id || null,
+          status: app.status || 'sent',
         };
         setInitial(init);
       } catch (err) {
