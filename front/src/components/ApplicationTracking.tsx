@@ -42,7 +42,7 @@ interface TimelineEvent {
   type: string;
   date: string;
   description?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>; // Replaced 'any' with 'unknown'
 }
 
 interface ApplicationTrackingProps {
@@ -50,7 +50,7 @@ interface ApplicationTrackingProps {
   privateNotes: PrivateNote[];
   reminders: Reminder[];
   timeline: TimelineEvent[];
-  onUpdate: (data: any) => void;
+  onUpdate: (data: unknown) => void; // Replaced 'any' with 'unknown'
 }
 
 const TIMELINE_ICONS: Record<string, React.ReactNode> = {
@@ -107,7 +107,7 @@ export default function ApplicationTracking({
       onUpdate(result.application);
       setNewNote("");
       toast.success("Note ajoutée");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de l'ajout de la note");
     } finally {
       setLoading(false);
@@ -123,7 +123,7 @@ export default function ApplicationTracking({
       setEditingNoteId(null);
       setEditingNoteContent("");
       toast.success("Note mise à jour");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de la mise à jour");
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ export default function ApplicationTracking({
       const result = await api.deleteNote(applicationId, noteId);
       onUpdate(result.application);
       toast.success("Note supprimée");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de la suppression");
     } finally {
       setLoading(false);
@@ -158,7 +158,7 @@ export default function ApplicationTracking({
       setNewReminderDate("");
       setNewReminderMessage("");
       toast.success("Rappel programmé");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de l'ajout du rappel");
     } finally {
       setLoading(false);
@@ -171,7 +171,7 @@ export default function ApplicationTracking({
       const result = await api.completeReminder(applicationId, reminderId);
       onUpdate(result.application);
       toast.success("Rappel marqué comme terminé");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de la mise à jour");
     } finally {
       setLoading(false);
@@ -185,7 +185,7 @@ export default function ApplicationTracking({
       const result = await api.deleteReminder(applicationId, reminderId);
       onUpdate(result.application);
       toast.success("Rappel supprimé");
-    } catch (err) {
+    } catch {
       toast.error("Erreur lors de la suppression");
     } finally {
       setLoading(false);

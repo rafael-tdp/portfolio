@@ -1,14 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LuArrowLeft, LuQrCode } from "react-icons/lu";
 import AuthGuard from "../../../../../components/AuthGuard";
 import QRCodeGenerator from "../../../../../components/QRCodeGenerator";
 import * as api from "../../../../../lib/api";
 
-export default function QRCodePage(props: { params: any }) {
+interface Application {
+  company?: {
+    publicSlug?: string;
+    logoUrl?: string;
+    name?: string;
+  };
+  jobTitle?: string;
+}
+
+export default function QRCodePage(props: { params: { id: string } }) {
   return (
     <AuthGuard>
       <QRCodeContent params={props.params} />
@@ -16,10 +24,10 @@ export default function QRCodePage(props: { params: any }) {
   );
 }
 
-function QRCodeContent({ params: rawParams }: { params: any }) {
-  const params = (React as any).use ? (React as any).use(rawParams) : rawParams;
-  const id = params?.id as string | undefined;
-  const [application, setApplication] = useState<any | null>(null);
+function QRCodeContent({ params: rawParams }: { params: { id: string } }) {
+  const params = rawParams;
+  const id = params?.id;
+  const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,8 +38,8 @@ function QRCodeContent({ params: rawParams }: { params: any }) {
         const app = await api.getApplication(id);
         if (!mounted) return;
         setApplication(app);
-      } catch (err) {
-        console.error("Failed to load application", err);
+      } catch {
+        console.error("Failed to load application");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -66,7 +74,7 @@ function QRCodeContent({ params: rawParams }: { params: any }) {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
             <LuQrCode className="w-12 h-12 mx-auto text-gray-400 mb-4" />
             <p className="text-gray-600">
-              Cette candidature n'a pas de lien public configuré.
+              Cette candidature n&apos;a pas de lien public configuré.
             </p>
           </div>
         </div>
