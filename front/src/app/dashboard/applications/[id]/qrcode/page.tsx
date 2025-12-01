@@ -16,7 +16,7 @@ interface Application {
   jobTitle?: string;
 }
 
-export default function QRCodePage(props: { params: { id: string } }) {
+export default function QRCodePage(props: { params: Promise<{ id: string }> }) {
   return (
     <AuthGuard>
       <QRCodeContent params={props.params} />
@@ -24,8 +24,8 @@ export default function QRCodePage(props: { params: { id: string } }) {
   );
 }
 
-function QRCodeContent({ params: rawParams }: { params: { id: string } }) {
-  const params = rawParams;
+function QRCodeContent({ params: rawParams }: { params: Promise<{ id: string }> }) {
+  const params = React.use(rawParams);
   const id = params?.id;
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
