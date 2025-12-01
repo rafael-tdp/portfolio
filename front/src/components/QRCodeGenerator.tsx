@@ -172,7 +172,7 @@ export default function QRCodeGenerator({
 
       {/* Usage instructions */}
       <div className="mt-4 p-4 bg-blue-50 rounded-lg max-w-md">
-        <h4 className="font-medium text-blue-900 mb-2">💡 Conseils d'utilisation</h4>
+        <h4 className="font-medium text-blue-900 mb-2">💡 Conseils d&apos;utilisation</h4>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Imprimez ce QR code sur votre CV papier</li>
           <li>• Le recruteur peut le scanner pour accéder à votre profil complet</li>

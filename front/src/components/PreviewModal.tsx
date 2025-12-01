@@ -200,7 +200,7 @@ export default function PreviewModal({
                     <div className="text-center py-12 text-gray-500">
                       <p>Aucune lettre de motivation générée.</p>
                       <p className="text-sm mt-2">
-                        Cliquez sur "Générer la lettre (IA)" dans le formulaire.
+                        Cliquez sur &quot;Générer la lettre (IA)&quot; dans le formulaire.
                       </p>
                     </div>
                   )}

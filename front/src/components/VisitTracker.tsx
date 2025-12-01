@@ -106,11 +106,7 @@ export default function VisitTracker({ slug }: VisitTrackerProps) {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === "attributes" || mutation.type === "childList") {
-          // Check for open sections by looking at CollapsibleSection containers
-          const cvSection = document.querySelector('[data-section="cv"]');
-          const coverLetterSection = document.querySelector('[data-section="coverLetter"]');
-          
-          // Also detect by checking if content is visible (for CollapsibleSection)
+          // Detect by checking if content is visible (for CollapsibleSection)
           document.querySelectorAll('[data-section]').forEach((el) => {
             const sectionName = el.getAttribute('data-section') as keyof SectionsViewed;
             const isOpen = el.getAttribute('data-open') === 'true';
