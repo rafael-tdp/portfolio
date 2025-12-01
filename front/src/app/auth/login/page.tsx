@@ -36,7 +36,7 @@ export default function LoginPage() {
         <input type="password" className="mt-1 mb-3 block w-full rounded border p-2" value={password} onChange={(e) => setPassword(e.target.value)} />
         <div className="flex items-center gap-3">
           <Button type="submit" loading={loading} disabled={loading}>Se connecter</Button>
-          <Link href="/auth/register" className="text-sm text-gray-600">Créer un compte</Link>
+          {/* <Link href="/auth/register" className="text-sm text-gray-600">Créer un compte</Link> */}
         </div>
       </form>
     </div>

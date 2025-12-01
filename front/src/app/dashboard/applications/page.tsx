@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { CiMenuKebab } from "react-icons/ci";
 import { useRouter } from "next/navigation";
-import { LuEye, LuEyeOff } from "react-icons/lu";
+import Link from "next/link";
+import { LuArrowLeft, LuEye, LuEyeOff, LuMessageSquare, LuBell } from "react-icons/lu";
 import AuthGuard from "../../../components/AuthGuard";
 import Button from "@/components/Button";
 import * as api from "@/lib/api";
@@ -123,6 +124,13 @@ function ApplicationsContent() {
 	return (
 		<div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">
 			<div className="max-w-3xl mx-auto">
+				<Link
+					href="/dashboard"
+					className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+				>
+					<LuArrowLeft className="w-4 h-4" />
+					<span>Retour au tableau de bord</span>
+				</Link>
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
 					<h2 className="text-xl sm:text-2xl font-normal">Candidatures</h2>
 					<Button
@@ -189,6 +197,13 @@ function ApplicationsContent() {
 											{a.status && (
 												<span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${STATUS_CONFIG[a.status]?.color || 'bg-gray-100 text-gray-700'}`}>
 													{STATUS_CONFIG[a.status]?.label || a.status}
+												</span>
+											)}
+											{/* Pending reminder indicator */}
+											{a.reminders && a.reminders.some((r: any) => !r.completed && new Date(r.date) <= new Date()) && (
+												<span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-amber-100 text-amber-700">
+													<LuBell className="w-3 h-3" />
+													Rappel
 												</span>
 											)}
 										</div>
@@ -280,6 +295,16 @@ function ApplicationsContent() {
 														))}
 													</div>
                                                     <label className="text-xs text-gray-500 mb-1 ml-2 mt-1 block">Actions</label>
+													<button
+														className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-600"
+														onClick={() => {
+															setOpenActionsId(null);
+															router.push(`/dashboard/applications/${a._id}/tracking`);
+														}}
+													>
+														<LuMessageSquare className="inline w-4 h-4 mr-2" />
+														Notes & Suivi
+													</button>
 													<button
 														className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-md cursor-pointer text-gray-600"
 														onClick={() => {

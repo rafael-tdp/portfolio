@@ -1,6 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Application from '../../mongodb/models/application.js'
 import mongoose from 'mongoose'
+import { v4 as uuidv4 } from 'uuid'
 
 export default class ApplicationsController {
   public async create({ request, response }: HttpContextContract) {
@@ -8,7 +9,7 @@ export default class ApplicationsController {
     // `company` is required; `user` is optional to allow anonymous submissions
     if (!body.company) return response.badRequest({ error: 'company is required' })
 
-    // create application
+    // create application with initial timeline event
     const app = await Application.create({
       company: body.company,
       user: body.user || undefined,
@@ -19,6 +20,9 @@ export default class ApplicationsController {
       hardSkills: body.hardSkills || {},
       coverLetter: body.coverLetter,
       status: body.status || 'draft',
+      timeline: [{ type: 'created', date: new Date(), description: 'Candidature créée' }],
+      privateNotes: [],
+      reminders: [],
     } as any)
 
     return response.created({ application: app })
@@ -57,7 +61,22 @@ export default class ApplicationsController {
 
     const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status'])
 
-    const updated = await Application.findByIdAndUpdate(id, { $set: body }, { new: true }).populate('company').populate('user').lean()
+    // Check if status changed to add timeline event
+    const currentApp = await Application.findById(id).lean()
+    const updateData: any = { $set: body }
+    
+    if (currentApp && body.status && body.status !== (currentApp as any).status) {
+      updateData.$push = {
+        timeline: {
+          type: 'status_changed',
+          date: new Date(),
+          description: `Statut changé vers "${body.status}"`,
+          metadata: { oldStatus: (currentApp as any).status, newStatus: body.status }
+        }
+      }
+    }
+
+    const updated = await Application.findByIdAndUpdate(id, updateData, { new: true }).populate('company').populate('user').lean()
     if (!updated) return response.notFound({ error: 'Application not found' })
 
     return response.ok({ application: updated })
@@ -72,5 +91,181 @@ export default class ApplicationsController {
     if (!deleted) return response.notFound({ error: 'Application not found' })
 
     return response.ok({ deleted: true })
+  }
+
+  // ========== Private Notes ==========
+  public async addNote({ params, request, response }: HttpContextContract) {
+    const id = params.id
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const { content } = request.only(['content'])
+    if (!content) return response.badRequest({ error: 'content is required' })
+
+    const note = {
+      id: uuidv4(),
+      content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    const updated = await Application.findByIdAndUpdate(
+      id,
+      { 
+        $push: { 
+          privateNotes: note,
+          timeline: { type: 'note_added', date: new Date(), description: 'Note ajoutée' }
+        } 
+      },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application not found' })
+    return response.ok({ application: updated, note })
+  }
+
+  public async updateNote({ params, request, response }: HttpContextContract) {
+    const { id, noteId } = params
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const { content } = request.only(['content'])
+    if (!content) return response.badRequest({ error: 'content is required' })
+
+    const updated = await Application.findOneAndUpdate(
+      { _id: id, 'privateNotes.id': noteId },
+      { 
+        $set: { 
+          'privateNotes.$.content': content,
+          'privateNotes.$.updatedAt': new Date()
+        } 
+      },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application or note not found' })
+    return response.ok({ application: updated })
+  }
+
+  public async deleteNote({ params, response }: HttpContextContract) {
+    const { id, noteId } = params
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const updated = await Application.findByIdAndUpdate(
+      id,
+      { $pull: { privateNotes: { id: noteId } } },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application not found' })
+    return response.ok({ application: updated })
+  }
+
+  // ========== Reminders ==========
+  public async addReminder({ params, request, response }: HttpContextContract) {
+    const id = params.id
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const { date, message } = request.only(['date', 'message'])
+    if (!date || !message) return response.badRequest({ error: 'date and message are required' })
+
+    const reminder = {
+      id: uuidv4(),
+      date: new Date(date),
+      message,
+      completed: false,
+      createdAt: new Date(),
+    }
+
+    const updated = await Application.findByIdAndUpdate(
+      id,
+      { 
+        $push: { 
+          reminders: reminder,
+          timeline: { type: 'reminder_set', date: new Date(), description: `Rappel programmé pour le ${new Date(date).toLocaleDateString('fr-FR')}` }
+        } 
+      },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application not found' })
+    return response.ok({ application: updated, reminder })
+  }
+
+  public async completeReminder({ params, response }: HttpContextContract) {
+    const { id, reminderId } = params
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const updated = await Application.findOneAndUpdate(
+      { _id: id, 'reminders.id': reminderId },
+      { $set: { 'reminders.$.completed': true } },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application or reminder not found' })
+    return response.ok({ application: updated })
+  }
+
+  public async deleteReminder({ params, response }: HttpContextContract) {
+    const { id, reminderId } = params
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const updated = await Application.findByIdAndUpdate(
+      id,
+      { $pull: { reminders: { id: reminderId } } },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application not found' })
+    return response.ok({ application: updated })
+  }
+
+  // ========== Timeline ==========
+  public async addTimelineEvent({ params, request, response }: HttpContextContract) {
+    const id = params.id
+    if (!id || !mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
+
+    const { type, description, metadata } = request.only(['type', 'description', 'metadata'])
+    if (!type) return response.badRequest({ error: 'type is required' })
+
+    const event = {
+      type,
+      date: new Date(),
+      description,
+      metadata,
+    }
+
+    const updated = await Application.findByIdAndUpdate(
+      id,
+      { $push: { timeline: event } },
+      { new: true }
+    ).populate('company').populate('user').lean()
+
+    if (!updated) return response.notFound({ error: 'Application not found' })
+    return response.ok({ application: updated })
+  }
+
+  // ========== Pending Reminders (for notifications) ==========
+  public async getPendingReminders({ response }: HttpContextContract) {
+    const now = new Date()
+    const apps = await Application.find({
+      'reminders': {
+        $elemMatch: {
+          completed: false,
+          date: { $lte: now }
+        }
+      }
+    }).populate('company').lean()
+
+    const pendingReminders = apps.flatMap((app: any) => 
+      (app.reminders || [])
+        .filter((r: any) => !r.completed && new Date(r.date) <= now)
+        .map((r: any) => ({
+          ...r,
+          applicationId: app._id,
+          companyName: app.company?.name,
+          jobTitle: app.jobTitle,
+        }))
+    )
+
+    return response.ok({ reminders: pendingReminders })
   }
 }

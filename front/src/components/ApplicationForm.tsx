@@ -8,7 +8,8 @@ import FormSectionTitle from "../components/FormSectionTitle";
 import FormLabel from "../components/FormLabel";
 import TextField from "../components/TextField";
 import Button from "../components/Button";
-import { LuPipette, LuCopy, LuTrash, LuSparkles } from "react-icons/lu";
+import PreviewModal from "../components/PreviewModal";
+import { LuPipette, LuCopy, LuTrash, LuSparkles, LuEye } from "react-icons/lu";
 import * as api from "../lib/api";
 import cvSample from "../data/cvSample";
 
@@ -106,6 +107,7 @@ export default function ApplicationForm({
 	);
 	const [status, setStatus] = useState(initial.status || 'sent');
 	const [loading, setLoading] = useState(false);
+	const [showPreview, setShowPreview] = useState(false);
 
 	// Helper to extract colors from theme if no colors are available
 	function colorsFromTheme(theme: Record<string, string> | null): Record<string, string> | null {
@@ -396,7 +398,7 @@ export default function ApplicationForm({
 	}
 
 	return (
-		<div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">
+		<div className="mx-auto px-4 sm:p-6 sm:pt-0 bg-gray-50 min-h-screen">
 			<div className="max-w-3xl mx-auto">
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
 					<h1 className="text-xl sm:text-2xl font-normal">
@@ -921,21 +923,41 @@ export default function ApplicationForm({
 				</section>
 
 				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-6">
-					<div className="mt-3">
-						<div>
-							<Button
-								type="button"
-								variant="primary"
-								onClick={saveApplication}
-								disabled={loading || !companyId || !coverLetter}
-								loading={loading}
-							>
-								Enregistrer la candidature
-							</Button>
-						</div>
+					<div className="flex flex-col sm:flex-row gap-3">
+						<Button
+							type="button"
+							variant="neutral"
+							onClick={() => setShowPreview(true)}
+							disabled={!companyName}
+						>
+							<LuEye className="w-4 h-4 mr-2" />
+							Aperçu
+						</Button>
+						<Button
+							type="button"
+							variant="primary"
+							onClick={saveApplication}
+							disabled={loading || !companyId || !coverLetter}
+							loading={loading}
+						>
+							Enregistrer la candidature
+						</Button>
 					</div>
 				</section>
 			</div>
+
+			{/* Preview Modal */}
+			<PreviewModal
+				isOpen={showPreview}
+				onClose={() => setShowPreview(false)}
+				companyName={companyName}
+				jobTitle={jobTitle}
+				coverLetter={coverLetter}
+				softSkills={softSkills}
+				hardSkills={hardSkills}
+				companyTheme={companyTheme}
+				logoUrl={logoPreviewUrl || resolveLogoUrl(companyLogoUrl)}
+			/>
 		</div>
 	);
 }

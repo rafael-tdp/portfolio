@@ -346,6 +346,7 @@ export default async function Page({ params }: Props) {
 						title="Mon CV"
 						defaultOpen={false}
 						theme={themeFinal}
+						sectionId="cv"
 					>
 						<article className="p-3 sm:p-6">
 							<CvViewer
@@ -364,6 +365,7 @@ export default async function Page({ params }: Props) {
 						title="Ma lettre de motivation"
 						defaultOpen={false}
 						theme={themeFinal}
+						sectionId="coverLetter"
 					>
 						<article className="p-3 sm:p-6">
 							{/* Use CoverLetterViewer to show/download the cover letter */}

@@ -7,11 +7,13 @@ export default function CollapsibleSection({
 	title,
 	defaultOpen = true,
 	theme,
+	sectionId,
 	children,
 }: {
 	title: string;
 	defaultOpen?: boolean;
 	theme?: any;
+	sectionId?: string;
 	placeholderText?: string;
 	children?: React.ReactNode;
 }) {
@@ -28,7 +30,11 @@ export default function CollapsibleSection({
 	}
 
 	return (
-		<section className="mb-4">
+		<section 
+			className="mb-4"
+			data-section={sectionId}
+			data-open={open ? "true" : "false"}
+		>
 			<div
 				className={`rounded-md shadow-sm overflow-hidden`}
 				style={{ backgroundColor: hexToRgba(theme?.primary, 0.04) }}

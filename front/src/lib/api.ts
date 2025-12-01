@@ -214,6 +214,122 @@ export async function deleteApplication(applicationId: string, deleteCompanyLogo
   return res.json()
 }
 
+// ============ NOTES ============
+
+export async function addNote(applicationId: string, content: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/notes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ content }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to add note")
+  return json
+}
+
+export async function updateNote(applicationId: string, noteId: string, content: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/notes/${noteId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ content }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to update note")
+  return json
+}
+
+export async function deleteNote(applicationId: string, noteId: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/notes/${noteId}`, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to delete note")
+  return json
+}
+
+// ============ REMINDERS ============
+
+export async function addReminder(applicationId: string, date: Date, message: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/reminders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ date: date.toISOString(), message }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to add reminder")
+  return json
+}
+
+export async function completeReminder(applicationId: string, reminderId: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/reminders/${reminderId}/complete`, {
+    method: "PATCH",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to complete reminder")
+  return json
+}
+
+export async function deleteReminder(applicationId: string, reminderId: string) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/reminders/${reminderId}`, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to delete reminder")
+  return json
+}
+
+export async function getPendingReminders() {
+  const token = getToken()
+  if (!token) return []
+  const res = await fetch(`${API_BASE}/api/applications/reminders/pending`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) return []
+  const json = await res.json()
+  return json.reminders || []
+}
+
+// ============ TIMELINE ============
+
+export async function addTimelineEvent(applicationId: string, type: string, description?: string, metadata?: any) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/applications/${applicationId}/timeline`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ type, description, metadata }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to add timeline event")
+  return json
+}
+
 // ============ VISITS ============
 
 export async function getVisitStats() {
@@ -226,11 +342,40 @@ export async function getVisitStats() {
   return res.json()
 }
 
-export async function trackVisit(slug: string) {
+export async function getAnalytics() {
+  const token = getToken()
+  if (!token) return null
+  const res = await fetch(`${API_BASE}/api/visits/analytics`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) return null
+  return res.json()
+}
+
+export async function trackVisit(slug: string, sessionId?: string) {
   const res = await fetch(`${API_BASE}/api/visits/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ slug }),
+    body: JSON.stringify({ slug, sessionId }),
+  })
+  return res.json()
+}
+
+export async function updateVisit(visitId: string, data: {
+  timeSpent?: number;
+  sectionsViewed?: {
+    cv?: boolean;
+    coverLetter?: boolean;
+    skills?: boolean;
+    experiences?: boolean;
+    projects?: boolean;
+  };
+  scrollDepth?: number;
+}) {
+  const res = await fetch(`${API_BASE}/api/visits/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ visitId, ...data }),
   })
   return res.json()
 }

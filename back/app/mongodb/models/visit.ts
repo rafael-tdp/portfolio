@@ -8,7 +8,20 @@ export interface IVisit extends Document {
   referer?: string
   country?: string
   city?: string
+  // New tracking fields
+  source?: string // domain name (linkedin.com, mail.google.com, direct, etc.)
+  timeSpent?: number // seconds spent on page
+  sectionsViewed?: {
+    cv?: boolean
+    coverLetter?: boolean
+    skills?: boolean
+    experiences?: boolean
+    projects?: boolean
+  }
+  scrollDepth?: number // percentage 0-100
+  sessionId?: string // to group page views
   createdAt?: Date
+  updatedAt?: Date
 }
 
 const VisitSchema = new Schema<IVisit>(
@@ -20,6 +33,18 @@ const VisitSchema = new Schema<IVisit>(
     referer: { type: String },
     country: { type: String },
     city: { type: String },
+    // New tracking fields
+    source: { type: String, default: 'direct' }, // Now stores domain name directly
+    timeSpent: { type: Number, default: 0 },
+    sectionsViewed: {
+      cv: { type: Boolean, default: false },
+      coverLetter: { type: Boolean, default: false },
+      skills: { type: Boolean, default: false },
+      experiences: { type: Boolean, default: false },
+      projects: { type: Boolean, default: false },
+    },
+    scrollDepth: { type: Number, default: 0 },
+    sessionId: { type: String },
   },
   { timestamps: true }
 )
@@ -27,5 +52,6 @@ const VisitSchema = new Schema<IVisit>(
 // Index for efficient queries
 VisitSchema.index({ application: 1, createdAt: -1 })
 VisitSchema.index({ company: 1, createdAt: -1 })
+VisitSchema.index({ sessionId: 1 })
 
 export default mongoose.models.Visit || mongoose.model<IVisit>('Visit', VisitSchema)

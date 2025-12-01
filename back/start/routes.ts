@@ -157,7 +157,7 @@ const handler = (controllerPath: string, method: string, options: { auth?: boole
 }
 
 // Auth
-router.post('/api/auth/register', handler('#controllers/Http/AuthController.js', 'register'))
+// router.post('/api/auth/register', handler('#controllers/Http/AuthController.js', 'register'))
 router.post('/api/auth/login', handler('#controllers/Http/AuthController.js', 'login'))
 router.get('/api/auth/me', handler('#controllers/Http/AuthController.js', 'me', { auth: true }))
 
@@ -172,10 +172,25 @@ router.patch('/api/companies/:id', handler('#controllers/Http/CompaniesControlle
 
 // Applications (protect creation)
 router.post('/api/applications', handler('#controllers/Http/ApplicationsController.js', 'create', { auth: true }))
+// Pending reminders (must be before :id route)
+router.get('/api/applications/reminders/pending', handler('#controllers/Http/ApplicationsController.js', 'getPendingReminders', { auth: true }))
 router.get('/api/applications/:id', handler('#controllers/Http/ApplicationsController.js', 'show'))
 router.get('/api/applications', handler('#controllers/Http/ApplicationsController.js', 'list', { auth: true }))
 router.delete('/api/applications/:id', handler('#controllers/Http/ApplicationsController.js', 'destroy', { auth: true }))
 router.patch('/api/applications/:id', handler('#controllers/Http/ApplicationsController.js', 'update', { auth: true }))
+
+// Application Notes
+router.post('/api/applications/:id/notes', handler('#controllers/Http/ApplicationsController.js', 'addNote', { auth: true }))
+router.patch('/api/applications/:id/notes/:noteId', handler('#controllers/Http/ApplicationsController.js', 'updateNote', { auth: true }))
+router.delete('/api/applications/:id/notes/:noteId', handler('#controllers/Http/ApplicationsController.js', 'deleteNote', { auth: true }))
+
+// Application Reminders
+router.post('/api/applications/:id/reminders', handler('#controllers/Http/ApplicationsController.js', 'addReminder', { auth: true }))
+router.patch('/api/applications/:id/reminders/:reminderId/complete', handler('#controllers/Http/ApplicationsController.js', 'completeReminder', { auth: true }))
+router.delete('/api/applications/:id/reminders/:reminderId', handler('#controllers/Http/ApplicationsController.js', 'deleteReminder', { auth: true }))
+
+// Application Timeline
+router.post('/api/applications/:id/timeline', handler('#controllers/Http/ApplicationsController.js', 'addTimelineEvent', { auth: true }))
 
 // Company logo processing - protected
 router.post('/api/companies/:id/extract-colors', handler('#controllers/Http/CompaniesController.js', 'extractColors', { auth: true }))
@@ -190,7 +205,9 @@ router.get('/public/:slug', handler('#controllers/Http/PublicController.js', 'sh
 
 // Visit tracking (public endpoint for tracking, protected for stats)
 router.post('/api/visits/track', handler('#controllers/Http/VisitsController.js', 'track'))
+router.post('/api/visits/update', handler('#controllers/Http/VisitsController.js', 'update'))
 router.get('/api/visits/stats', handler('#controllers/Http/VisitsController.js', 'stats', { auth: true }))
+router.get('/api/visits/analytics', handler('#controllers/Http/VisitsController.js', 'analytics', { auth: true }))
 router.get('/api/visits/application/:id', handler('#controllers/Http/VisitsController.js', 'byApplication', { auth: true }))
 router.delete('/api/visits/all', handler('#controllers/Http/VisitsController.js', 'deleteAll', { auth: true }))
 
