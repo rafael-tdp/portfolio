@@ -283,7 +283,7 @@ export default async function Page({ params }: Props) {
 									Bienvenue {company?.name}
 									<span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl ml-2 sm:ml-3">👋</span>
 								</h1>
-								<p className="mt-2 text-sm sm:text-base md:text-lg opacity-90">
+								<p className="mt-2 text-sm sm:text-base md:text-lg opacity-90" style={{ color: themeFinal.title }}>
 									Candidature au poste de{" "}
 									<span className="font-semibold">
 										{application?.jobTitle || "—"}
