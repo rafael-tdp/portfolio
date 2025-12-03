@@ -8,8 +8,8 @@ import QRCodeGenerator from "../../../../../components/QRCodeGenerator";
 import * as api from "../../../../../lib/api";
 
 interface Application {
+  slug?: string;
   company?: {
-    publicSlug?: string;
     logoUrl?: string;
     name?: string;
   };
@@ -59,7 +59,7 @@ function QRCodeContent({ params: rawParams }: { params: Promise<{ id: string }> 
   if (loading) return <div className="p-6">Chargement...</div>;
   if (!application) return <div className="p-6">Candidature introuvable</div>;
 
-  const publicSlug = application.company?.publicSlug;
+  const publicSlug = application.slug;
   if (!publicSlug) {
     return (
       <div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">

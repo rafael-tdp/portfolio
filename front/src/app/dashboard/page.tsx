@@ -5,7 +5,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import AuthGuard from "../../components/AuthGuard";
 import Button from "../../components/Button";
-import { LuEye, LuUsers, LuClock, LuLogOut } from "react-icons/lu";
+import RecentActivitySection from "../../components/RecentActivitySection";
+import { LuEye, LuClock, LuLogOut, LuFileText, LuPlus, LuFolderOpen } from "react-icons/lu";
 import { FiTrendingUp } from "react-icons/fi";
 import * as api from "@/lib/api";
 
@@ -19,7 +20,35 @@ export default function DashboardPage() {
 
 type VisitStats = {
 	totalVisits: number;
-	applications: Array<{
+	uniqueVisitors: number;
+	avgVisitsPerDay?: number;
+	avgTimeSpent?: number;
+	avgScrollDepth?: number;
+	visitsByDay?: Array<{ date: string; count: number; uniqueVisitors: number }>;
+	visitsByHour?: Array<{ hour: number; count: number }>;
+	deviceStats?: Array<{ device: string; count: number }>;
+	browserStats?: Array<{ browser: string; count: number }>;
+	sourceStats?: Array<{ source: string; count: number }>;
+	sectionStats?: Array<{ section: string; count: number; key: string }>;
+	topApplications?: Array<{
+		applicationId: string;
+		jobTitle: string;
+		companyName: string;
+		totalVisits: number;
+		uniqueVisitors: number;
+		lastVisit: string;
+	}>;
+	recentActivity: Array<{
+		_id: string;
+		createdAt: string;
+		userAgent: string;
+		source?: string;
+		timeSpent?: number;
+		sectionsViewed?: Record<string, boolean>;
+		companyName: string;
+		jobTitle: string;
+	}>;
+	applications?: Array<{
 		applicationId: string;
 		jobTitle: string;
 		companyId: string;
@@ -27,7 +56,7 @@ type VisitStats = {
 		uniqueVisitors: number;
 		lastVisit: string | null;
 	}>;
-	visits: Array<{
+	visits?: Array<{
 		_id: string;
 		createdAt: string;
 		ip?: string;
@@ -35,12 +64,14 @@ type VisitStats = {
 		company?: { name: string; logoUrl?: string };
 		application?: { jobTitle: string };
 	}>;
+	applicationCount?: number;
 };
 
 function DashboardContent() {
 	const [user, setUser] = React.useState<any | null>(null);
 	const [visitStats, setVisitStats] = React.useState<VisitStats | null>(null);
 	const [loadingStats, setLoadingStats] = React.useState(true);
+	const [applicationCount, setApplicationCount] = React.useState(0);
 	const [loggingOut, setLoggingOut] = React.useState(false);
 
 	React.useEffect(() => {
@@ -60,7 +91,7 @@ function DashboardContent() {
 		})();
 	}, []);
 
-	// Load visit stats
+	// Load visit stats and application count
 	React.useEffect(() => {
 		const t =
 			typeof window !== "undefined"
@@ -72,11 +103,16 @@ function DashboardContent() {
 		}
 		(async () => {
 			try {
-				const stats = await api.getVisitStats();
+				const [stats, apps] = await Promise.all([
+					api.getAnalytics(),
+					api.getApplications(),
+				]);
 				setVisitStats(stats);
+				setApplicationCount(Array.isArray(apps) ? apps.length : 0);
 			} catch (err) {
-				console.warn("Failed to load visit stats", err);
+				console.warn("Failed to load visit stats or applications", err);
 				setVisitStats(null);
+				setApplicationCount(0);
 			} finally {
 				setLoadingStats(false);
 			}
@@ -104,13 +140,6 @@ function DashboardContent() {
 			hour: "2-digit",
 			minute: "2-digit",
 		});
-	}
-
-	function getDeviceFromUA(ua?: string) {
-		if (!ua) return "Inconnu";
-		if (/mobile/i.test(ua)) return "📱 Mobile";
-		if (/tablet/i.test(ua)) return "📱 Tablette";
-		return "💻 Desktop";
 	}
 
 	return (
@@ -156,33 +185,37 @@ function DashboardContent() {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-					<Link
-						href="/dashboard/applications"
-						className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
-					>
-						<div className="font-semibold text-gray-800 text-sm sm:text-base">
-							Mes candidatures
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+				<Link
+					href="/dashboard/applications"
+					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all group"
+				>
+					<div className="flex items-center gap-3 mb-2">
+						<div className="w-10 h-10 rounded-lg bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
+							<LuFolderOpen className="w-5 h-5 text-sky-600" />
 						</div>
-						<div className="text-xs sm:text-sm text-gray-400 mt-1">
-							Voir et gérer vos candidatures
-						</div>
-					</Link>
+						<div className="font-semibold text-gray-800">Mes candidatures</div>
+					</div>
+					<div className="text-xs sm:text-sm text-gray-500">
+						Voir et gérer vos candidatures
+					</div>
+				</Link>
 
-					<Link
-						href="/dashboard/create"
-						className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
-					>
-						<div className="font-semibold text-gray-800 text-sm sm:text-base">
-							Nouvelle candidature
+				<Link
+					href="/dashboard/create"
+					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all group"
+				>
+					<div className="flex items-center gap-3 mb-2">
+						<div className="w-10 h-10 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+							<LuPlus className="w-5 h-5 text-emerald-600" />
 						</div>
-						<div className="text-xs sm:text-sm text-gray-400 mt-1">
-							Créer une nouvelle candidature
-						</div>
-					</Link>
-				</div>
-
-				{/* Quick stats */}
+						<div className="font-semibold text-gray-800">Nouvelle candidature</div>
+					</div>
+					<div className="text-xs sm:text-sm text-gray-500">
+						Ciblée ou spontanée
+					</div>
+				</Link>
+			</div>				{/* Quick stats */}
 				{!loadingStats && visitStats && (
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
 						<div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
@@ -200,17 +233,14 @@ function DashboardContent() {
 						</div>
 						<div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
 							<div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
-								<LuUsers className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+								<LuFileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
 							</div>
 							<div>
 								<div className="text-xl sm:text-2xl font-bold text-gray-800">
-									{visitStats.applications.reduce(
-										(sum, a) => sum + a.uniqueVisitors,
-										0
-									)}
+									{applicationCount}
 								</div>
 								<div className="text-xs sm:text-sm text-gray-400">
-									Visiteurs uniques
+									Nombre de candidatures
 								</div>
 							</div>
 						</div>
@@ -220,9 +250,9 @@ function DashboardContent() {
 							</div>
 							<div>
 								<div className="text-xs sm:text-sm font-semibold text-gray-800">
-									{visitStats.visits[0]
+									{visitStats.recentActivity && visitStats.recentActivity.length > 0
 										? formatDate(
-												visitStats.visits[0].createdAt
+												visitStats.recentActivity[0].createdAt
 										  ).replace(",", " à ")
 										: "—"}
 								</div>
@@ -260,9 +290,24 @@ function DashboardContent() {
 					</Link>
 				)}
 
-				{/* Recent visits */}
+				{/* Recent activity */}
 				{!loadingStats &&
 					visitStats &&
+					visitStats.recentActivity &&
+					visitStats.recentActivity.length > 0 && (
+						<div className="mb-6">
+							<RecentActivitySection
+								recentActivity={visitStats.recentActivity}
+								maxItems={15}
+							/>
+						</div>
+					)}
+
+				{/* Old Recent visits - shown only if recentActivity is not available */}
+				{!loadingStats &&
+					visitStats &&
+					(!visitStats.recentActivity || visitStats.recentActivity.length === 0) &&
+					visitStats.visits &&
 					visitStats.visits.length > 0 && (
 						<div className="bg-white rounded-xl border border-gray-100 mb-6 overflow-hidden">
 							<div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 bg-gray-50/50">
@@ -278,7 +323,7 @@ function DashboardContent() {
 											key={v._id}
 											className={`px-4 sm:px-5 py-2 flex items-center justify-between hover:bg-gray-50/50 transition-colors ${
 												index !==
-												visitStats.visits.slice(0, 20)
+												(visitStats.visits?.slice(0, 20) || [])
 													.length -
 													1
 													? "border-b border-gray-50"
@@ -286,13 +331,9 @@ function DashboardContent() {
 											}`}
 										>
 											<div className="flex items-center gap-3 sm:gap-4 min-w-0">
-												<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-sm sm:text-base shadow-sm flex-shrink-0">
-													{
-														getDeviceFromUA(
-															v.userAgent
-														).split(" ")[0]
-													}
-												</div>
+											<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-sm sm:text-base shadow-sm flex-shrink-0">
+												💻
+											</div>
 												<div className="min-w-0">
 													<div className="text-xs sm:text-sm font-medium text-gray-800 truncate">
 														{v.company?.name ||
@@ -309,7 +350,6 @@ function DashboardContent() {
 												<div className="text-xs sm:text-sm text-gray-600">
 													{formatDate(v.createdAt)}
 												</div>
-												{/* <div className="text-xs text-gray-300 mt-0.5 font-mono">{v.ip || ""}</div> */}
 											</div>
 										</div>
 									))}
@@ -320,6 +360,7 @@ function DashboardContent() {
 				{/* Stats per application */}
 				{!loadingStats &&
 					visitStats &&
+					visitStats.applications &&
 					visitStats.applications.length > 0 && (
 						<div className="bg-white rounded-xl border border-gray-100 mb-6 overflow-hidden">
 							<div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 bg-gray-50/50">
@@ -328,12 +369,12 @@ function DashboardContent() {
 								</h2>
 							</div>
 							<div className="max-h-60 overflow-y-auto">
-								{visitStats.applications.map((app, index) => (
+								{(visitStats.applications || []).map((app, index) => (
 									<div
 										key={app.applicationId}
 										className={`px-4 sm:px-5 py-2 flex items-center justify-between hover:bg-gray-50/50 transition-colors ${
 											index !==
-											visitStats.applications.length - 1
+											(visitStats.applications?.length || 1) - 1
 												? "border-b border-gray-50"
 												: ""
 										}`}

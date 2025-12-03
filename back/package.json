@@ -11,7 +11,9 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate:slugs": "node --env-file=.env build/scripts/migrate-application-slugs.js",
+    "remove:duplicate-companies": "node --env-file=.env build/scripts/remove-duplicate-companies.js"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*",

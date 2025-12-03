@@ -96,11 +96,8 @@ function ApplicationsContent() {
 	const handleDelete = async (a: AppType) => {
 		const ok = window.confirm("Supprimer cette candidature ?");
 		if (!ok) return;
-		const delLogo = window.confirm(
-			"Supprimer également le logo de l'entreprise associé à cette candidature ?"
-		);
 		try {
-			await api.deleteApplication(a._id, delLogo);
+			await api.deleteApplication(a._id);
 			setApps((prev) => (prev || []).filter((x) => x._id !== a._id));
 		} catch (err) {
 			alert("Impossible de supprimer: " + String(err));
@@ -131,15 +128,15 @@ function ApplicationsContent() {
 					<LuArrowLeft className="w-4 h-4" />
 					<span>Retour au tableau de bord</span>
 				</Link>
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-					<h2 className="text-xl sm:text-2xl font-normal">Candidatures</h2>
-					<Button
-						onClick={() => router.push("/dashboard/create")}
-						className="w-full sm:w-auto"
-					>
-						Nouvelle candidature
-					</Button>
-				</div>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+				<h2 className="text-xl sm:text-2xl font-normal">Candidatures</h2>
+				<Button
+					onClick={() => router.push("/dashboard/create")}
+					className="w-full sm:w-auto"
+				>
+					Nouvelle candidature
+				</Button>
+			</div>
 				{loading && <div>Chargement...</div>}
 				{!loading && (!apps || apps.length === 0) && (
 					<div>Aucune candidature trouvée.</div>
@@ -152,7 +149,7 @@ function ApplicationsContent() {
 								className="bg-white p-3 sm:p-4 rounded shadow-sm flex flex-col gap-3 cursor-pointer"
 								onClick={() =>
 									window.open(
-										`/${a.company?.publicSlug}?preview=true`,
+										`/${a.slug}?preview=true`,
 										"_blank"
 									)
 								}
@@ -210,6 +207,17 @@ function ApplicationsContent() {
 									</div>
 
 									<div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+										{/* Notes indicator */}
+										{a.privateNotes && a.privateNotes.length > 0 && (
+											<div
+												className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-medium bg-indigo-50 text-indigo-700"
+												title={`${a.privateNotes.length} note${a.privateNotes.length > 1 ? "s" : ""}`}
+											>
+												<LuMessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+												<span>{a.privateNotes.length}</span>
+											</div>
+										)}
+
 										{/* Visit indicator */}
 										{(() => {
 											const stats = visitStats[a._id];

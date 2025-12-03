@@ -58,7 +58,6 @@ function EditContent({ params: rawParams }: { params: any }) {
           companyLogoUrl: app.company?.logoUrl || null,
           companyColors: app.company?.colors || null,
           companyTheme: app.company?.theme || null,
-          publicSlug: app.company?.publicSlug || null,
           jobTitle: app.jobTitle || "",
           jobDescription: app.jobDescription || "",
           coverLetter: app.coverLetter || "",

@@ -1,13 +1,25 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Application from '../../mongodb/models/application.js'
+import Company from '../../mongodb/models/company.js'
+import Visit from '../../mongodb/models/visit.js'
 import mongoose from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
+import { generateUniqueApplicationSlug } from '../../utils/slugGenerator.js'
 
 export default class ApplicationsController {
   public async create({ request, response }: HttpContextContract) {
     const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status'])
     // `company` is required; `user` is optional to allow anonymous submissions
     if (!body.company) return response.badRequest({ error: 'company is required' })
+
+    // Fetch company to get its name for slug generation
+    const company = await Company.findById(body.company).lean() as any
+    if (!company || typeof company !== 'object' || !company.name) {
+      return response.badRequest({ error: 'company not found' })
+    }
+
+    // Generate unique slug for application
+    const slug = await generateUniqueApplicationSlug(company.name)
 
     // create application with initial timeline event
     const app = await Application.create({
@@ -20,6 +32,7 @@ export default class ApplicationsController {
       hardSkills: body.hardSkills || {},
       coverLetter: body.coverLetter,
       status: body.status || 'draft',
+      slug,
       timeline: [{ type: 'created', date: new Date(), description: 'Candidature créée' }],
       privateNotes: [],
       reminders: [],
@@ -89,6 +102,9 @@ export default class ApplicationsController {
 
     const deleted = await Application.findByIdAndDelete(id)
     if (!deleted) return response.notFound({ error: 'Application not found' })
+
+    // Also delete associated visits, but NOT the company
+    await Visit.deleteMany({ application: id })
 
     return response.ok({ deleted: true })
   }

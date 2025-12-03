@@ -19,12 +19,48 @@ export default class VisitsController {
   }
 
   /**
+   * Extract UTM parameters from referer or query string
+   */
+  private extractUtmParams(referer: string, queryString?: string): { utmSource?: string; utmMedium?: string; utmCampaign?: string } {
+    const params: any = {}
+    
+    // Try to extract from query string first (if provided)
+    if (queryString) {
+      const url = new URL(`http://example.com?${queryString}`)
+      if (url.searchParams.has('utm_source')) params.utmSource = url.searchParams.get('utm_source')
+      if (url.searchParams.has('utm_medium')) params.utmMedium = url.searchParams.get('utm_medium')
+      if (url.searchParams.has('utm_campaign')) params.utmCampaign = url.searchParams.get('utm_campaign')
+    }
+    
+    // If referer exists and no UTM in query, try to extract from referer
+    if (referer && !params.utmSource) {
+      try {
+        const url = new URL(referer)
+        if (url.searchParams.has('utm_source')) params.utmSource = url.searchParams.get('utm_source')
+        if (url.searchParams.has('utm_medium')) params.utmMedium = url.searchParams.get('utm_medium')
+        if (url.searchParams.has('utm_campaign')) params.utmCampaign = url.searchParams.get('utm_campaign')
+      } catch {}
+    }
+    
+    return params
+  }
+
+  /**
+   * Get best available source (prefer UTM, fallback to referer domain)
+   */
+  private getBestSource(utmSource: string | undefined, refererDomain: string): string {
+    if (utmSource) return utmSource.toLowerCase()
+    if (refererDomain && refererDomain !== 'direct') return refererDomain.toLowerCase()
+    return 'direct'
+  }
+
+  /**
    * Track a visit to a public candidature page.
    * POST /api/visits/track
-   * Body: { slug: string, sessionId?: string }
+   * Body: { slug: string, sessionId?: string, query?: string }
    */
   public async track({ request, response }: HttpContextContract) {
-    const { slug, sessionId } = request.body() || {}
+    const { slug, sessionId, query } = request.body() || {}
     if (!slug) {
       return response.badRequest({ error: 'slug required' })
     }
@@ -49,7 +85,13 @@ export default class VisitsController {
     const ip = typeof ipRaw === 'string' ? ipRaw.split(',')[0].trim() : 'unknown'
     const userAgent = request.header('user-agent') || ''
     const referer = request.header('referer') || ''
-    const source = this.extractDomain(referer)
+    const refererDomain = this.extractDomain(referer)
+    
+    // Extract UTM parameters
+    const { utmSource, utmMedium, utmCampaign } = this.extractUtmParams(referer, query)
+    
+    // Determine best source (UTM takes priority over referer domain)
+    const source = this.getBestSource(utmSource, refererDomain)
 
     // Ignore localhost visits (local development)
     const localhostIps = ['::1', '127.0.0.1', 'localhost', '::ffff:127.0.0.1']
@@ -65,6 +107,9 @@ export default class VisitsController {
       userAgent,
       referer,
       source,
+      utmSource,
+      utmMedium,
+      utmCampaign,
       sessionId: sessionId || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timeSpent: 0,
       sectionsViewed: {
@@ -271,7 +316,7 @@ export default class VisitsController {
 
     // Device stats from user agent
     const allVisits = await Visit.find({ application: { $in: appIds } })
-      .select('userAgent source timeSpent sectionsViewed scrollDepth')
+      .select('ip userAgent source timeSpent sectionsViewed scrollDepth')
       .lean()
 
     const deviceCounts: Record<string, number> = { Desktop: 0, Mobile: 0, Tablet: 0, Unknown: 0 }
@@ -377,6 +422,7 @@ export default class VisitsController {
           applicationId: '$_id',
           jobTitle: '$application.jobTitle',
           companyName: '$company.name',
+          applicationSlug: '$application.slug',
           totalVisits: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' },
           lastVisit: 1,
@@ -416,9 +462,13 @@ export default class VisitsController {
       {
         $project: {
           _id: 1,
+          applicationSlug: '$applicationData.slug',
           createdAt: 1,
           userAgent: 1,
           source: 1,
+          utmSource: 1,
+          utmMedium: 1,
+          utmCampaign: 1,
           timeSpent: 1,
           sectionsViewed: 1,
           companyName: '$companyData.name',

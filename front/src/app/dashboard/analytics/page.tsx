@@ -31,6 +31,7 @@ type AnalyticsData = {
 	sectionStats: Array<{ section: string; count: number; key: string }>;
 	topApplications: Array<{
 		applicationId: string;
+		applicationSlug: string;
 		jobTitle: string;
 		companyName: string;
 		totalVisits: number;
@@ -39,9 +40,13 @@ type AnalyticsData = {
 	}>;
 	recentActivity: Array<{
 		_id: string;
+		applicationSlug: string;
 		createdAt: string;
 		userAgent: string;
 		source?: string;
+		utmSource?: string;
+		utmMedium?: string;
+		utmCampaign?: string;
 		timeSpent?: number;
 		sectionsViewed?: Record<string, boolean>;
 		companyName: string;
@@ -654,9 +659,10 @@ function AnalyticsContent() {
 					analytics.topApplications.length > 0 ? (
 						<div className="divide-y divide-gray-50">
 							{analytics.topApplications.map((app, index) => (
-								<div
+								<Link
 									key={app.applicationId}
-									className="px-4 sm:px-5 py-3 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
+									href={`/${app.applicationSlug}?preview=true`}
+									className="px-4 sm:px-5 py-3 flex items-center justify-between hover:bg-gray-50/50 transition-colors cursor-pointer"
 								>
 									<div className="flex items-center gap-3 min-w-0">
 										<div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-100 to-sky-50 flex items-center justify-center text-sm font-bold text-sky-600 flex-shrink-0">
@@ -690,7 +696,7 @@ function AnalyticsContent() {
 											</div>
 										</div>
 									</div>
-								</div>
+								</Link>
 							))}
 						</div>
 					) : (
@@ -711,9 +717,10 @@ function AnalyticsContent() {
 					analytics.recentActivity.length > 0 ? (
 						<div className="max-h-96 overflow-y-auto divide-y divide-gray-50">
 							{analytics.recentActivity.map((activity) => (
-								<div
+								<Link
 									key={activity._id}
-									className="px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors"
+									href={`/${activity.applicationSlug}?preview=true`}
+									className="px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors cursor-pointer block"
 								>
 									<div className="flex items-center justify-between mb-2">
 										<div className="flex items-center gap-3 min-w-0">
@@ -774,7 +781,7 @@ function AnalyticsContent() {
 											</>
 										)}
 									</div>
-								</div>
+								</Link>
 							))}
 						</div>
 					) : (

@@ -303,7 +303,7 @@ export default async function Page({ params }: Props) {
 						<GoLink size={14} />
 						<span>Lien de partage</span>
 						<CopySlugBadge
-							slug={company?.publicSlug}
+							slug={application?.slug}
 							accent={themeFinal.accent}
 							bg={getLighterColor(themeFinal.accent, 0.85)}
 						/>

@@ -30,7 +30,6 @@ type InitialData = Partial<{
 	companyLogoUrl: string | null;
 	companyColors: Record<string, string> | null;
 	companyTheme: Record<string, string> | null;
-	publicSlug: string | null;
 	jobTitle: string;
 	jobDescription: string;
 	coverLetter: string;
@@ -98,16 +97,26 @@ export default function ApplicationForm({
 	const [companyId, setCompanyId] = useState<string | null>(
 		initial.companyId || null
 	);
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [publicSlug, setPublicSlug] = useState<string | null>(
-		initial.publicSlug || null
-	);
 	const [applicationId, setApplicationId] = useState<string | null>(
 		initial.applicationId || null
 	);
 	const [status, setStatus] = useState(initial.status || 'sent');
 	const [loading, setLoading] = useState(false);
 	const [showPreview, setShowPreview] = useState(false);
+	const [isSpontaneous, setIsSpontaneous] = useState(false);
+
+	// Company selection states
+	const [existingCompanies, setExistingCompanies] = useState<Array<{
+		_id: string;
+		name: string;
+		logoUrl?: string;
+		colors?: Record<string, string>;
+		theme?: Record<string, string>;
+	}>>([]);
+	const [loadingCompanies, setLoadingCompanies] = useState(true);
+	const [showCompanyForm, setShowCompanyForm] = useState(!initial.companyId);
+	const [companySearchTerm, setCompanySearchTerm] = useState("");
+	const [filteredCompanies, setFilteredCompanies] = useState<typeof existingCompanies>([]);
 
 	// Helper to extract colors from theme if no colors are available
 	function colorsFromTheme(theme: Record<string, string> | null): Record<string, string> | null {
@@ -133,6 +142,44 @@ export default function ApplicationForm({
 			setCompanyTheme(initial.companyTheme);
 		}
 	}, [initial.companyColors, initial.companyTheme]);
+
+	// Handle spontaneous toggle
+	React.useEffect(() => {
+		if (isSpontaneous) {
+			setJobTitle("Développeur Full Stack Junior");
+			setJobDescription("");
+		}
+	}, [isSpontaneous]);
+
+	// Load existing companies
+	React.useEffect(() => {
+		const loadCompanies = async () => {
+			try {
+				setLoadingCompanies(true);
+				const companies = await api.getCompanies();
+				setExistingCompanies(companies);
+			} catch (error) {
+				console.error('Failed to load companies:', error);
+			} finally {
+				setLoadingCompanies(false);
+			}
+		};
+		loadCompanies();
+	}, []);
+
+	// Filter companies based on search term
+	React.useEffect(() => {
+		if (!companySearchTerm.trim()) {
+			setFilteredCompanies(existingCompanies);
+		} else {
+			const term = companySearchTerm.toLowerCase();
+			setFilteredCompanies(
+				existingCompanies.filter(c =>
+					c.name.toLowerCase().includes(term)
+				)
+			);
+		}
+	}, [companySearchTerm, existingCompanies]);
 
 	function resolveLogoUrl(url: string | null | undefined) {
 		if (!url) return null;
@@ -245,6 +292,16 @@ export default function ApplicationForm({
 		};
 	}, [companyLogoUrl]);
 
+	async function handleSelectCompany(company: typeof existingCompanies[number]) {
+		setCompanyId(company._id);
+		setCompanyName(company.name);
+		setCompanyLogoUrl(company.logoUrl || null);
+		setCompanyColors(company.colors || null);
+		setCompanyTheme(company.theme || null);
+		setShowCompanyForm(false);
+		setCompanySearchTerm("");
+	}
+
 	async function finalizeCreateCompany() {
 		if (!companyName) return toast.error("Entrez le nom de l'entreprise");
 		setLoading(true);
@@ -255,7 +312,6 @@ export default function ApplicationForm({
 				const company = await api.createCompany(companyName);
 				id = company._id || company.id;
 				setCompanyId(id);
-				setPublicSlug(company.publicSlug || null);
 			} else {
 				// If editing, ensure the company name is persisted
 				try {
@@ -435,17 +491,137 @@ export default function ApplicationForm({
 						1. L&apos;entreprise
 					</FormSectionTitle>
 					<div className="flex flex-col gap-6">
-						<div className="md:col-span-2">
-							<TextField
-								id="company-name"
-								label="Nom de l'entreprise"
-								value={companyName}
-								onChange={(e) => setCompanyName(e.target.value)}
-							/>
-						</div>
+						{/* Company selection UI */}
+						{!showCompanyForm && companyId && (
+							<div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-200">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-3">
+										{companyLogoUrl && (
+											<img
+												src={resolveLogoUrl(companyLogoUrl) || ""}
+												alt={companyName}
+												className="w-12 h-12 rounded object-contain"
+											/>
+										)}
+										<div>
+											<p className="text-sm font-medium text-gray-900">{companyName}</p>
+											<p className="text-xs text-gray-600">Entreprise sélectionnée</p>
+										</div>
+									</div>
+									<button
+										type="button"
+										onClick={() => {
+											setShowCompanyForm(true);
+											setCompanySearchTerm("");
+										}}
+										className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+									>
+										Modifier
+									</button>
+								</div>
+							</div>
+						)}
 
-						<div className="md:flex md:flex-col">
-							<FormLabel>Logo</FormLabel>
+						{/* Company selection or form */}
+						{showCompanyForm ? (
+							<>
+								{/* Search existing companies */}
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Sélectionner une entreprise existante
+									</label>
+									{loadingCompanies ? (
+										<div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
+											Chargement des entreprises...
+										</div>
+									) : existingCompanies.length > 0 ? (
+										<>
+											<input
+												type="text"
+												placeholder="Rechercher une entreprise..."
+												value={companySearchTerm}
+												onChange={(e) => setCompanySearchTerm(e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+											/>
+											{filteredCompanies.length > 0 ? (
+												<div className="border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
+													{filteredCompanies.map((company) => (
+														<button
+															key={company._id}
+															type="button"
+															onClick={() => handleSelectCompany(company)}
+															className="w-full text-left px-3 py-2 hover:bg-indigo-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3 transition-colors"
+														>
+															{company.logoUrl && (
+																<img
+																	src={resolveLogoUrl(company.logoUrl) || ""}
+																	alt={company.name}
+																	className="w-8 h-8 rounded object-contain flex-shrink-0"
+																/>
+															)}
+															<div className="flex-1">
+																<p className="text-sm font-medium text-gray-900">{company.name}</p>
+															</div>
+														</button>
+													))}
+												</div>
+											) : (
+												<div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
+													Aucune entreprise correspondante
+												</div>
+											)}
+										</>
+									) : null}
+								</div>
+
+								{/* Separator or new company option */}
+								{existingCompanies.length > 0 && (
+									<div className="relative">
+										<div className="absolute inset-0 flex items-center">
+											<div className="w-full border-t border-gray-200"></div>
+										</div>
+										<div className="relative flex justify-center text-sm">
+											<span className="px-2 bg-white text-gray-500">ou</span>
+										</div>
+									</div>
+								)}
+
+								{/* Create new company form */}
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										{existingCompanies.length > 0 ? 'Créer une nouvelle entreprise' : 'Nom de l\'entreprise'}
+									</label>
+									<TextField
+										id="company-name"
+										label=""
+										placeholder="Entrez le nom de l'entreprise"
+										value={companyName}
+										onChange={(e) => setCompanyName(e.target.value)}
+									/>
+								</div>
+							</>
+					) : null}
+
+					<div className="md:flex md:flex-col">
+						<FormLabel>Logo</FormLabel>
+						{companyId && !showCompanyForm ? (
+							// Entreprise existante sélectionnée - afficher un avertissement
+							<div className="mt-2 w-full">
+								<LogoUploader
+									initialUrl={resolveLogoUrl(companyLogoUrl)}
+									onFileChange={(f: File | null) =>
+										setLogoFile(f)
+									}
+								/>
+								<div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+									<p className="text-xs text-amber-900">
+										⚠️ <strong>Attention:</strong> La modification du logo affectera cette entreprise pour{' '}
+										<strong>toutes les candidatures</strong>.
+									</p>
+								</div>
+							</div>
+						) : (
+							// Formulaire de création - upload normal
 							<div className="mt-2 w-full">
 								<LogoUploader
 									initialUrl={resolveLogoUrl(companyLogoUrl)}
@@ -454,18 +630,17 @@ export default function ApplicationForm({
 									}
 								/>
 							</div>
-							<div className="mt-3 w-full">
-								<div className="text-xs text-gray-500">
-									Les couleurs sont prélevées automatiquement
-									lors de la sélection du logo — ou depuis le
-									logo existant lorsque vous editez une
-									entreprise.
-								</div>
+						)}
+						<div className="mt-3 w-full">
+							<div className="text-xs text-gray-500">
+								Les couleurs sont prélevées automatiquement
+								lors de la sélection du logo — ou depuis le
+								logo existant lorsque vous editez une
+								entreprise.
 							</div>
 						</div>
 					</div>
-
-					{companyColors && (
+				</div>					{companyColors && (
 						<div className="mt-6">
 							{/* Bouton toggle avec aperçu des couleurs */}
 							<button
@@ -690,46 +865,75 @@ export default function ApplicationForm({
 					</div>
 				</section>
 
-				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
-					<FormSectionTitle className="mb-3">
-						2. Le poste
-					</FormSectionTitle>
-					<TextField
-						id="job-title"
-						label="Titre du poste"
-						value={jobTitle}
-						onChange={(e) => setJobTitle(e.target.value)}
+			<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
+				<FormSectionTitle className="mb-3">
+					2. Le poste
+				</FormSectionTitle>
+				
+				{/* Spontaneous toggle */}
+				<div className="mb-4 flex items-center gap-3">
+					<input
+						type="checkbox"
+						id="spontaneous-toggle"
+						checked={isSpontaneous}
+						onChange={(e) => setIsSpontaneous(e.target.checked)}
+						className="w-4 h-4 cursor-pointer"
 					/>
-					<div className="mt-4">
-						<TextField
-							id="job-description"
-							label="Description du poste"
-							placeholder="Décrivez le poste, les responsabilités, les compétences requises, etc."
-							textarea
-							rows={6}
-							value={jobDescription}
-							onChange={(e) => setJobDescription(e.target.value)}
-						/>
-					</div>
-					<div className="mt-3">
-						<div>
-							<Button
-								type="button"
-								variant="indigo"
-								onClick={generateCover}
-								disabled={
-									loading || !companyId || !jobDescription
-								}
-								loading={loading}
-								icon={<LuSparkles />}
-							>
-								Générer la lettre
-							</Button>
-						</div>
-					</div>
-				</section>
+					<label htmlFor="spontaneous-toggle" className="text-sm text-gray-700 cursor-pointer">
+						Candidature spontanée (sans description du poste)
+					</label>
+				</div>
 
-				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
+				{!isSpontaneous && (
+					<>
+						<TextField
+							id="job-title"
+							label="Titre du poste"
+							value={jobTitle}
+							onChange={(e) => setJobTitle(e.target.value)}
+						/>
+						<div className="mt-4">
+							<TextField
+								id="job-description"
+								label="Description du poste"
+								placeholder="Décrivez le poste, les responsabilités, les compétences requises, etc."
+								textarea
+								rows={6}
+								value={jobDescription}
+								onChange={(e) => setJobDescription(e.target.value)}
+							/>
+						</div>
+					</>
+				)}
+
+				{isSpontaneous && (
+					<div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+						<p className="text-sm text-blue-900">
+							✓ Titre automatique : <strong>Développeur Full Stack Junior</strong>
+						</p>
+						<p className="text-xs text-blue-700 mt-1">
+							L&apos;IA générera une candidature adaptée à l&apos;entreprise sans détails de poste spécifique.
+						</p>
+					</div>
+				)}
+
+				<div className="mt-3">
+					<div>
+						<Button
+							type="button"
+							variant="indigo"
+							onClick={generateCover}
+							disabled={
+								loading || !companyId || (!isSpontaneous && !jobDescription)
+							}
+							loading={loading}
+							icon={<LuSparkles />}
+						>
+							Générer la lettre
+						</Button>
+					</div>
+				</div>
+			</section>				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
 					<FormSectionTitle className="mb-3">
 						3. La Lettre de Motivation	
 					</FormSectionTitle>

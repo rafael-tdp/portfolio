@@ -68,8 +68,8 @@ function TrackingContent({ params: rawParams }: { params: any }) {
   if (loading) return <div className="p-6">Chargement...</div>;
   if (!application) return <div className="p-6">Candidature introuvable</div>;
 
-  const publicUrl = application.company?.publicSlug
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/${application.company.publicSlug}`
+  const publicUrl = application.slug
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/${application.slug}`
     : null;
 
   return (

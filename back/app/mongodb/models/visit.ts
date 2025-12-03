@@ -10,6 +10,9 @@ export interface IVisit extends Document {
   city?: string
   // New tracking fields
   source?: string // domain name (linkedin.com, mail.google.com, direct, etc.)
+  utmSource?: string // UTM source parameter (linkedin, email, google, etc.)
+  utmMedium?: string // UTM medium parameter (organic, paid, email, etc.)
+  utmCampaign?: string // UTM campaign parameter
   timeSpent?: number // seconds spent on page
   sectionsViewed?: {
     cv?: boolean
@@ -35,6 +38,9 @@ const VisitSchema = new Schema<IVisit>(
     city: { type: String },
     // New tracking fields
     source: { type: String, default: 'direct' }, // Now stores domain name directly
+    utmSource: { type: String }, // UTM source parameter
+    utmMedium: { type: String }, // UTM medium parameter
+    utmCampaign: { type: String }, // UTM campaign parameter
     timeSpent: { type: Number, default: 0 },
     sectionsViewed: {
       cv: { type: Boolean, default: false },

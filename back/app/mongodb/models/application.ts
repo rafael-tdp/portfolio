@@ -36,6 +36,7 @@ export interface IApplication extends Document {
   coverLetter?: string
   coverLetterMeta?: Record<string, any>
   status?: string
+  slug?: string
   // New fields for enhanced tracking
   privateNotes?: IPrivateNote[]
   reminders?: IReminder[]
@@ -84,6 +85,7 @@ const ApplicationSchema = new Schema<IApplication>(
     coverLetter: { type: String },
     coverLetterMeta: { type: Schema.Types.Mixed },
     status: { type: String, default: 'sent' },
+    slug: { type: String, index: true, unique: true, sparse: true },
     // New fields
     privateNotes: { type: [PrivateNoteSchema], default: [] },
     reminders: { type: [ReminderSchema], default: [] },

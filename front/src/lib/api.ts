@@ -102,6 +102,18 @@ export async function patchCompany(companyId: string, payload: any) {
   return json
 }
 
+export async function getCompanies() {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/companies`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Failed to fetch companies")
+  return json.companies || []
+}
+
 export async function generateCover(payload: any) {
   const token = getToken()
   const res = await fetch(`${API_BASE}/api/ia/generate-cover`, {
@@ -200,7 +212,7 @@ export async function getApplications() {
   return json.applications || json
 }
 
-export async function deleteApplication(applicationId: string, deleteCompanyLogo?: boolean) {
+export async function deleteApplication(applicationId: string) {
   const token = getToken()
   const res = await fetch(`${API_BASE}/api/applications/${applicationId}`, {
     method: "DELETE",
@@ -208,7 +220,6 @@ export async function deleteApplication(applicationId: string, deleteCompanyLogo
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ deleteCompanyLogo }),
   })
   if (!res.ok) throw new Error("Échec suppression")
   return res.json()
@@ -353,10 +364,26 @@ export async function getAnalytics() {
 }
 
 export async function trackVisit(slug: string, sessionId?: string) {
+  // Extract UTM parameters from URL query string
+  let query = ""
+  if (typeof window !== "undefined") {
+    const urlParams = new URLSearchParams(window.location.search)
+    const utm_source = urlParams.get("utm_source")
+    const utm_medium = urlParams.get("utm_medium")
+    const utm_campaign = urlParams.get("utm_campaign")
+    
+    const params = new URLSearchParams()
+    if (utm_source) params.append("utm_source", utm_source)
+    if (utm_medium) params.append("utm_medium", utm_medium)
+    if (utm_campaign) params.append("utm_campaign", utm_campaign)
+    
+    query = params.toString()
+  }
+
   const res = await fetch(`${API_BASE}/api/visits/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ slug, sessionId }),
+    body: JSON.stringify({ slug, sessionId, query: query || undefined }),
   })
   return res.json()
 }

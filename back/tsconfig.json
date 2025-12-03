@@ -13,6 +13,7 @@
     "start/**/*.ts",
     "config/**/*.ts",
     "database/**/*.ts",
+    "scripts/**/*.ts",
     "tests/**/*.ts"
   ]
 }

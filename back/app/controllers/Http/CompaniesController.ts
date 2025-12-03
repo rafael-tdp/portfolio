@@ -114,9 +114,18 @@ export default class CompaniesController {
   }
 
   public async list({ request, response }: HttpContextContract) {
-    const q = request.input('q') || ''
-    const companies = await Company.find({ name: { $regex: q, $options: 'i' } }).limit(50).lean()
-    return response.ok({ companies })
+    try {
+      const q = request.input('q') || ''
+      const query = q ? { name: { $regex: q, $options: 'i' } } : {}
+      const companies = await Company.find(query)
+        .select('_id name logoUrl publicSlug colors theme')
+        .limit(100)
+        .lean()
+      return response.ok({ companies })
+    } catch (err) {
+      console.error('[CompaniesController] list error', err)
+      return response.internalServerError({ error: 'Failed to fetch companies' })
+    }
   }
 
   public async extractColors({ params, request, response }: HttpContextContract) {
