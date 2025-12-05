@@ -12,12 +12,15 @@ import * as api from "@/lib/api";
 
 interface Props {
 	params: { slug: string };
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
 	// Some Next runtimes provide `params` as a thenable — await it first.
 	const resolvedParams = (await params) as { slug: string };
+	const resolvedSearchParams = (await searchParams) as Record<string, string | string[] | undefined>;
 	const slug = resolvedParams.slug;
+	const isPreview = resolvedSearchParams.preview === "true";
 	
 	const json = await api.getPublicApplication(slug);
 	if (!json) return notFound();
@@ -26,6 +29,10 @@ export default async function Page({ params }: Props) {
 	const application = json.application;
 	if (!company) return notFound();
 	if (!application) return notFound();
+	
+	// Detect if this is a spontaneous application
+	const isSpontaneous = !application.jobDescription || application.jobDescription.trim() === "";
+	
 	// If company provides a colours palette but not a full theme, derive a usable theme
 	function hexToRgb(hex?: string) {
 		if (!hex) return null;
@@ -283,18 +290,29 @@ export default async function Page({ params }: Props) {
 									Bienvenue {company?.name}
 									<span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl ml-2 sm:ml-3">👋</span>
 								</h1>
-								<p className="mt-2 text-sm sm:text-base md:text-lg opacity-90" style={{ color: themeFinal.title }}>
-									Candidature au poste de{" "}
-									<span className="font-semibold">
-										{application?.jobTitle || "—"}
-									</span>
-								</p>
-								{company?.tagline && (
-									<p className="mt-1 text-xs sm:text-sm opacity-80">
-										{company.tagline}
-									</p>
+							<p className="mt-2 text-sm sm:text-base md:text-lg opacity-90" style={{ color: themeFinal.title }}>
+								{!application?.jobDescription || application.jobDescription.trim() === "" ? (
+									<>
+										Candidature spontanée pour un poste de{" "}
+										<span className="font-semibold">
+											{application?.jobTitle || "—"}
+										</span>
+									</>
+								) : (
+									<>
+										Candidature au poste de{" "}
+										<span className="font-semibold">
+											{application?.jobTitle || "—"}
+										</span>
+									</>
 								)}
-							</div>
+							</p>
+							{company?.tagline && (
+								<p className="mt-1 text-xs sm:text-sm opacity-80">
+									{company.tagline}
+								</p>
+							)}
+						</div>
 						</div>
 					</div>
 
@@ -309,13 +327,24 @@ export default async function Page({ params }: Props) {
 						/>
 					</div>
 
-					<div className="mb-8 sm:mb-12 text-sm sm:text-base text-gray-700 leading-relaxed">
-						<p>
-							Merci de prendre le temps de consulter ma candidature pour le poste de{" "}
-							<span className="font-semibold" style={{ color: themeFinal.secondary }}>
-								{application?.jobTitle || "—"}
-							</span>.
-						</p>
+				<div className="mb-8 sm:mb-12 text-sm sm:text-base text-gray-700 leading-relaxed">
+					<p>
+						{isSpontaneous ? (
+							<>
+								Merci de prendre le temps de consulter ma candidature spontanée pour un poste de{" "}
+								<span className="font-semibold" style={{ color: themeFinal.secondary }}>
+									{application?.jobTitle || "—"}
+								</span>.
+							</>
+						) : (
+							<>
+								Merci de prendre le temps de consulter ma candidature pour le poste de{" "}
+								<span className="font-semibold" style={{ color: themeFinal.secondary }}>
+									{application?.jobTitle || "—"}
+								</span>.
+							</>
+						)}
+					</p>
 						<p className="mt-2 text-gray-700">
 							Vous trouverez ci-dessous mon CV ainsi que ma lettre de motivation, 
 							qui détaillent mon parcours et ma motivation à rejoindre {company?.name}.
@@ -332,6 +361,7 @@ export default async function Page({ params }: Props) {
                                 date: new Date().toLocaleDateString(),
                                 companyName: company?.name,
                                 jobTitle: application?.jobTitle,
+                                jobDescription: application?.jobDescription,
                                 logoUrl: logoSrc,
                             }}
                             theme={themeFinal}
@@ -389,6 +419,20 @@ export default async function Page({ params }: Props) {
 							</div>
 						</article>
 					</CollapsibleSection>
+
+					{/* Job Description Section - Only in preview mode */}
+					{isPreview && application?.jobDescription && application.jobDescription.trim() !== "" && (
+						<CollapsibleSection
+							title="Descriptif du poste"
+							defaultOpen={false}
+							theme={themeFinal}
+							sectionId="jobDescription"
+						>
+							<article className="p-3 sm:p-6 prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+								{application.jobDescription}
+							</article>
+						</CollapsibleSection>
+					)}
 				</div>
 			</main>
 		</div>

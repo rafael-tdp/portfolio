@@ -1156,6 +1156,7 @@ export default function ApplicationForm({
 				onClose={() => setShowPreview(false)}
 				companyName={companyName}
 				jobTitle={jobTitle}
+				jobDescription={jobDescription}
 				coverLetter={coverLetter}
 				softSkills={softSkills}
 				hardSkills={hardSkills}

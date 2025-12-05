@@ -10,6 +10,7 @@ type CLData = {
 	date?: string;
 	companyName?: string;
 	jobTitle?: string;
+	jobDescription?: string;
 	logoUrl?: string;
 };
 
@@ -169,7 +170,11 @@ export default function CoverLetterHtml({
 					) : null}
 				</div>
 				<div className="font-semibold text-sm mb-10">
-					Objet: Candidature au poste de {d.jobTitle || "Poste"}
+					Objet: {!d.jobDescription || d.jobDescription.trim() === "" ? (
+						<>Candidature spontanée pour un poste de {d.jobTitle || "Poste"}</>
+					) : (
+						<>Candidature au poste de {d.jobTitle || "Poste"}</>
+					)}
 				</div>
 
 				<article className="prose text-sm text-gray-800 whitespace-pre-wrap font-light text-justify	">

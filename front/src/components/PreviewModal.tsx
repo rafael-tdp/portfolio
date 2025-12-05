@@ -11,6 +11,7 @@ interface PreviewModalProps {
   onClose: () => void;
   companyName: string;
   jobTitle: string;
+  jobDescription?: string;
   coverLetter: string;
   softSkills: string[];
   hardSkills: Record<string, string>;
@@ -23,6 +24,7 @@ export default function PreviewModal({
   onClose,
   companyName,
   jobTitle,
+  jobDescription,
   coverLetter,
   softSkills,
   hardSkills,
@@ -58,6 +60,7 @@ export default function PreviewModal({
     date: new Date().toLocaleDateString("fr-FR"),
     companyName,
     jobTitle,
+    jobDescription,
     logoUrl,
   };
 
@@ -161,7 +164,7 @@ export default function PreviewModal({
                     className="w-16 h-16 object-contain rounded-md bg-white/10 p-1"
                   />
                 )}
-                <div>
+                <div className="flex-1">
                   <h1
                     className="text-2xl sm:text-3xl font-bold"
                     style={{ color: theme.title }}
@@ -169,8 +172,17 @@ export default function PreviewModal({
                     Bienvenue {companyName} 👋
                   </h1>
                   <p className="mt-1 text-sm opacity-90" style={{ color: theme.title }}>
-                    Candidature au poste de <strong>{jobTitle || "—"}</strong>
+                    {!jobDescription || jobDescription.trim() === "" ? (
+                      <>Candidature spontanée pour un poste de <strong>{jobTitle || "—"}</strong></>
+                    ) : (
+                      <>Candidature au poste de <strong>{jobTitle || "—"}</strong></>
+                    )}
                   </p>
+                  {jobDescription && jobDescription.trim() !== "" && (
+                    <p className="mt-3 text-sm leading-relaxed opacity-80" style={{ color: theme.title }}>
+                      <em>{jobDescription}</em>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
