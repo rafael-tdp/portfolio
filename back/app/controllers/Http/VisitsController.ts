@@ -65,19 +65,16 @@ export default class VisitsController {
       return response.badRequest({ error: 'slug required' })
     }
 
-    // Find company by slug
-    const company = await Company.findOne({ publicSlug: slug }).lean()
-    if (!company) {
-      return response.notFound({ error: 'Company not found' })
-    }
-
-    // Find associated application
-    const companyId = (company as any)._id
-    const application = await Application.findOne({ company: companyId })
-      .sort({ createdAt: -1 })
-      .lean()
+    // Find application by slug (application slug is unique per candidature)
+    const application = await Application.findOne({ slug }).lean()
     if (!application) {
       return response.notFound({ error: 'Application not found' })
+    }
+
+    // Get the company associated with this application
+    const company = await Company.findById((application as any).company).lean()
+    if (!company) {
+      return response.notFound({ error: 'Company not found' })
     }
 
     // Extract visitor info from request
