@@ -99,7 +99,7 @@ export default class VisitsController {
     // Create visit record
     const visit = await Visit.create({
       application: (application as any)._id,
-      company: companyId,
+      company: (company as any)._id,
       ip,
       userAgent,
       referer,
