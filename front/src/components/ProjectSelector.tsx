@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { LuSparkles } from "react-icons/lu";
 import Button from "./Button";
 
@@ -149,7 +149,7 @@ export default function ProjectSelector({
 					className="text-sm px-3 py-2"
 				>
 					<LuSparkles className="w-4 h-4 mr-1" />
-					Sélectionner avec l'IA
+					Sélectionner avec l&apos;IA
 				</Button>
 			)}
 		</div>
