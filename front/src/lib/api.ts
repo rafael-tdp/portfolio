@@ -200,6 +200,21 @@ export async function generateHardSkills(jobTitle: string, jobDescription: strin
   return json
 }
 
+export async function recommendProjects(jobDescription: string, projects: any[]) {
+  const token = getToken()
+  const res = await fetch(`${API_BASE}/api/ia/recommend-projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ jobDescription, projects }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || "Recommendation failed")
+  return json
+}
+
 // ============ APPLICATIONS (list & delete) ============
 
 export async function getApplications() {

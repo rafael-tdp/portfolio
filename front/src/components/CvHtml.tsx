@@ -23,7 +23,13 @@ type CVData = {
 		period?: string;
 		bullets?: string[];
 	}>;
-	projects?: Array<{ name?: string; period?: string; description?: string }>;
+	projects?: Array<{ 
+		name?: string; 
+		period?: string; 
+		description?: string[];
+		tags?: string[];
+		isDefault?: boolean;
+	}>;
 	availability?: string;
 	languages?: Array<{ name?: string; level?: string }>;
 	interests?: string[];
@@ -110,13 +116,75 @@ export default function CvHtml({
 	theme,
 	jobTitle,
 	logoUrl,
+	jobDescription,
+	selectedProjects,
 }: {
 	data: CVData;
 	theme?: any;
 	jobTitle?: string;
 	logoUrl?: string;
+	jobDescription?: string;
+	selectedProjects?: string[];
 }) {
 	const d = data || {};
+
+	// Use pre-selected projects if provided, otherwise apply intelligent filtering
+	const filteredProjects = React.useMemo(() => {
+		const projects = (d.projects as any[]) || [];
+		
+		// If selectedProjects is provided (from ApplicationForm/PreviewModal), use only those
+		if (selectedProjects && selectedProjects.length > 0) {
+			return projects.filter((p) => selectedProjects.includes(p.name));
+		}
+		
+		if (!jobDescription || jobDescription.trim() === "") {
+			// Return default projects
+			return projects.filter((p) => p.isDefault !== false);
+		}
+
+		// Simple tag-based filtering for now
+		// In production, this could call the AI recommendation endpoint
+		const keywords = jobDescription.toLowerCase().split(/\s+/);
+		const scoredProjects = projects.map((project) => {
+			let score = 0;
+
+			// Score based on tags
+			if (project.tags) {
+				for (const tag of project.tags) {
+					if (keywords.some((kw) => tag.toLowerCase().includes(kw))) {
+						score += 2;
+					}
+				}
+			}
+
+			// Score based on description
+			if (project.description) {
+				const description = project.description.join(" ").toLowerCase();
+				for (const keyword of keywords) {
+					if (description.includes(keyword)) {
+						score += 1;
+					}
+				}
+			}
+
+			// Default projects get a minimum score
+			if (project.isDefault !== false) {
+				score = Math.max(score, 5);
+			}
+
+			return { ...project, score };
+		});
+
+		// Return projects sorted by score (highest first)
+		return scoredProjects
+			.filter((p) => p.score > 0)
+			.sort((a, b) => b.score - a.score)
+			.map((p: any) => {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { score, ...rest } = p;
+				return rest;
+			});
+	}, [d.projects, jobDescription, selectedProjects]);
 
 	function CvSectionTitle({ title }: { title?: string }) {
 		return (
@@ -429,25 +497,25 @@ export default function CvHtml({
 						</div>
 					</section>
 
-					<section className="mb-6">
-						<CvSectionTitle title="Projets" />
-						<div className="mt-3 space-y-4 text-gray-700">
-							{d.projects?.map((p: any, i: number) => (
-								<div key={i}>
-									<div className="flex justify-between mb-1">
-										<span className="text-[0.73rem] font-semibold">
-											{p.name}{" "}
-										</span>
-										<span className="text-gray-500 text-[0.65rem]">
-											{p.period}
-										</span>
-									</div>
-									<ul className="list-disc list-inside">
-										{p.description?.map(
-											(desc: string, di: number) => (
-												<li
-													key={di}
-													dangerouslySetInnerHTML={{
+				<section className="mb-6">
+					<CvSectionTitle title="Projets" />
+					<div className="mt-3 space-y-4 text-gray-700">
+						{filteredProjects?.map((p: any, i: number) => (
+							<div key={i}>
+								<div className="flex justify-between mb-1">
+									<span className="text-[0.73rem] font-semibold">
+										{p.name}{" "}
+									</span>
+									<span className="text-gray-500 text-[0.65rem]">
+										{p.period}
+									</span>
+								</div>
+								<ul className="list-disc list-inside">
+									{p.description?.map(
+										(desc: string, di: number) => (
+											<li
+												key={di}
+												dangerouslySetInnerHTML={{
 														__html: desc ?? "",
 													}}
 												/>

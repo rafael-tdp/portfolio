@@ -232,6 +232,12 @@ export default async function Page({ params, searchParams }: Props) {
 		}
 	}
 
+	// Use selectedProjects from application if they exist
+	let selectedProjects: string[] = [];
+	if (application?.selectedProjects && Array.isArray(application.selectedProjects) && application.selectedProjects.length > 0) {
+		selectedProjects = application.selectedProjects;
+	}
+
 	return (
 		<div className="min-h-screen">
 			{/* Track visit when page loads */}
@@ -385,7 +391,9 @@ export default async function Page({ params, searchParams }: Props) {
 								showHtml
 								theme={themeFinal}
 								jobTitle={application?.jobTitle}
+								jobDescription={application?.jobDescription}
 								logoUrl={logoSrc ?? undefined}
+								selectedProjects={selectedProjects}
 							/>
 						</article>
 					</CollapsibleSection>

@@ -8,7 +8,7 @@ import { generateUniqueApplicationSlug } from '../../utils/slugGenerator.js'
 
 export default class ApplicationsController {
   public async create({ request, response }: HttpContextContract) {
-    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status'])
+    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status', 'selectedProjects'])
     // `company` is required; `user` is optional to allow anonymous submissions
     if (!body.company) return response.badRequest({ error: 'company is required' })
 
@@ -31,6 +31,7 @@ export default class ApplicationsController {
       softSkills: body.softSkills || [],
       hardSkills: body.hardSkills || {},
       coverLetter: body.coverLetter,
+      selectedProjects: body.selectedProjects || [],
       status: body.status || 'draft',
       slug,
       timeline: [{ type: 'created', date: new Date(), description: 'Candidature créée' }],
@@ -72,7 +73,7 @@ export default class ApplicationsController {
     if (!id) return response.badRequest({ error: 'id required' })
     if (!mongoose.isValidObjectId(id)) return response.badRequest({ error: 'invalid id' })
 
-    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status'])
+    const body = request.only(['company', 'user', 'jobTitle', 'jobDescription', 'requiredSkills', 'coverLetter', 'softSkills', 'hardSkills', 'status', 'selectedProjects'])
 
     // Check if status changed to add timeline event
     const currentApp = await Application.findById(id).lean()

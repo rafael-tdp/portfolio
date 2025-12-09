@@ -466,4 +466,118 @@ Retourne UNIQUEMENT l'objet JSON, sans texte avant ou après.`
       return response.ok({ hardSkills: cvSampleSkills, generated: false })
     }
   }
+
+  /**
+   * POST /api/ia/recommend-projects
+   * Utilise Gemini pour recommander les projets les plus adaptés au descriptif du poste
+   */
+  public async recommendProjects({ request, response }: HttpContextContract) {
+    const { jobDescription, projects } = request.all()
+
+    if (!jobDescription) {
+      return response.badRequest({ error: 'jobDescription is required' })
+    }
+
+    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+      return response.badRequest({ error: 'projects array is required' })
+    }
+
+    try {
+      if (!GOOGLE_API_KEY) {
+        return response.internalServerError({
+          error: 'Google API key not configured',
+        })
+      }
+
+      const projectsList = projects
+        .map(
+          (p: any, i: number) => `
+${i + 1}. ${p.name}
+   Description: ${p.description?.join(' ') || ''}
+   Tags: ${p.tags?.join(', ') || ''}
+`
+        )
+        .join('\n')
+
+      const prompt = `Vous êtes un expert en sélection de projets pour un CV. 
+Analysez le descriptif du poste suivant et recommandez les projets les plus pertinents à mettre en avant dans un CV.
+
+Descriptif du poste:
+${jobDescription}
+
+Projets disponibles:
+${projectsList}
+
+Répondez UNIQUEMENT avec un JSON valide (pas d'autres textes avant ou après) au format:
+{
+  "recommendedProjects": ["Nom du projet 1", "Nom du projet 2"],
+  "reasoning": "Explication courte de pourquoi ces projets sont recommandés"
+}
+
+Recommandez entre 2 et 4 projets les plus pertinents basés sur les compétences, technologies et domaines mentionnés dans le descriptif du poste.`
+
+      let content: string = ''
+
+      try {
+        // Try using the official Google GenAI SDK
+        const mod = await import('@google/genai')
+        const GoogleGenAI = (mod as any).GoogleGenAI || (mod as any).default || mod
+        const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY })
+        const sdkResp: any = await ai.models.generateContent({
+          model: GOOGLE_MODEL,
+          contents: prompt,
+        })
+        content = sdkResp?.text || sdkResp?.output?.[0]?.content || JSON.stringify(sdkResp)
+      } catch (sdkErr) {
+        console.warn('GenAI SDK unavailable, falling back to HTTP call', sdkErr)
+
+        // Fallback to HTTP call
+        const fetcher = await getFetch()
+        const url = `https://generativelanguage.googleapis.com/v1/models/${GOOGLE_MODEL}:generate?key=${GOOGLE_API_KEY}`
+        const r: any = await fetcher(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: { text: prompt },
+            temperature: 0.7,
+            maxOutputTokens: 500,
+          }),
+        })
+
+        if (!r.ok) {
+          const txt = await r.text().catch(() => '')
+          console.error('Gemini API error', r.status, txt)
+          return response.internalServerError({
+            error: 'Failed to generate recommendations',
+            details: txt,
+          })
+        }
+
+        const json: any = await r.json()
+        content =
+          json?.candidates?.[0]?.content ||
+          json?.output?.[0]?.content ||
+          json?.result?.[0]?.content ||
+          JSON.stringify(json)
+      }
+
+      // Parse JSON from response
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { recommendedProjects: [], reasoning: '' }
+
+      // Valider que les projets recommandés existent dans la liste
+      const projectNames = projects.map((p: any) => p.name)
+      const validRecommendations = (result.recommendedProjects || []).filter((name: string) =>
+        projectNames.includes(name)
+      )
+
+      return response.ok({
+        recommendedProjects: validRecommendations,
+        reasoning: result.reasoning || '',
+      })
+    } catch (err) {
+      console.error('[IaController] Error recommending projects:', err)
+      return response.internalServerError({ error: 'Failed to get recommendations' })
+    }
+  }
 }

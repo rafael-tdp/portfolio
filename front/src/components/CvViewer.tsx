@@ -11,14 +11,18 @@ export default function CvViewer({
 	showHtml = false,
 	theme,
 	jobTitle,
+	jobDescription,
 	logoUrl,
+	selectedProjects,
 }: {
 	pdfSrc?: string;
 	data?: CVData;
 	showHtml?: boolean;
 	theme?: any;
 	jobTitle?: string;
+	jobDescription?: string;
 	logoUrl?: string;
+	selectedProjects?: string[];
 }) {
 	const [showHtmlState, setShowHtmlState] = React.useState<boolean>(showHtml);
 
@@ -34,9 +38,9 @@ export default function CvViewer({
 						className="origin-top scale-[0.4] sm:scale-[0.5] md:scale-[0.65] lg:scale-100"
 						style={{ transformOrigin: 'top center' }}
 					>
-						<div className="border border-gray-200 shadow-lg">
-							<CvHtml data={data} theme={theme} jobTitle={jobTitle} logoUrl={logoUrl} />
-						</div>
+					<div className="border border-gray-200 shadow-lg">
+						<CvHtml data={data} theme={theme} jobTitle={jobTitle} jobDescription={jobDescription} logoUrl={logoUrl} selectedProjects={selectedProjects} />
+					</div>
 					</div>
 				</div>
 			</div>

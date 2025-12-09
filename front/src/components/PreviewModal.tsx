@@ -17,6 +17,7 @@ interface PreviewModalProps {
   hardSkills: Record<string, string>;
   companyTheme: Record<string, string> | null;
   logoUrl?: string | null;
+  selectedProjects?: string[];
 }
 
 export default function PreviewModal({
@@ -30,6 +31,7 @@ export default function PreviewModal({
   hardSkills,
   companyTheme,
   logoUrl,
+  selectedProjects = [],
 }: PreviewModalProps) {
   const [activeTab, setActiveTab] = useState<"cv" | "coverLetter">("cv");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -51,6 +53,9 @@ export default function PreviewModal({
     ...cvSample,
     softSkills: softSkills.length > 0 ? softSkills : cvSample.softSkills,
     skills: Object.keys(hardSkills).length > 0 ? hardSkills : cvSample.skills,
+    projects: selectedProjects.length > 0
+      ? (cvSample.projects as any[]).filter((p) => selectedProjects.includes(p.name))
+      : cvSample.projects,
   };
 
   // Cover letter data
@@ -197,7 +202,9 @@ export default function PreviewModal({
                     showHtml
                     theme={theme}
                     jobTitle={jobTitle}
+                    jobDescription={jobDescription}
                     logoUrl={logoUrl || undefined}
+                    selectedProjects={selectedProjects}
                   />
                 </div>
               ) : (

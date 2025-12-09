@@ -9,6 +9,7 @@ import FormLabel from "../components/FormLabel";
 import TextField from "../components/TextField";
 import Button from "../components/Button";
 import PreviewModal from "../components/PreviewModal";
+import ProjectSelector from "../components/ProjectSelector";
 import { LuPipette, LuCopy, LuTrash, LuSparkles, LuEye } from "react-icons/lu";
 import * as api from "../lib/api";
 import cvSample from "../data/cvSample";
@@ -93,6 +94,9 @@ export default function ApplicationForm({
 			? initial.hardSkills 
 			: cvSample.skills
 	);
+	const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+	const [recommendedProjects, setRecommendedProjects] = useState<string[]>([]);
+	const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 	const [generatingSoftSkills, setGeneratingSoftSkills] = useState(false);
 	const [companyId, setCompanyId] = useState<string | null>(
 		initial.companyId || null
@@ -292,6 +296,40 @@ export default function ApplicationForm({
 		};
 	}, [companyLogoUrl]);
 
+	// Load project recommendations when jobDescription changes
+	React.useEffect(() => {
+		// Initialize with default projects
+		const defaultProjects = (cvSample.projects as any[])
+			.filter((p) => p.isDefault)
+			.map((p) => p.name);
+		setSelectedProjects(defaultProjects);
+		setRecommendedProjects([]);
+	}, []);
+
+	async function handleGetProjectRecommendations() {
+		if (!jobDescription || jobDescription.trim() === "") return;
+		
+		setLoadingRecommendations(true);
+		try {
+			const data = await api.recommendProjects(
+				jobDescription,
+				(cvSample.projects as any[]).map((p) => ({
+					name: p.name,
+					description: p.description,
+					tags: p.tags,
+				}))
+			);
+			setRecommendedProjects(data.recommendedProjects || []);
+			// Auto-select recommended projects
+			setSelectedProjects(data.recommendedProjects || []);
+		} catch (error) {
+			console.warn("Failed to get project recommendations:", error);
+			toast.error("Erreur lors de la recommandation des projets");
+		} finally {
+			setLoadingRecommendations(false);
+		}
+	}
+
 	async function handleSelectCompany(company: typeof existingCompanies[number]) {
 		setCompanyId(company._id);
 		setCompanyName(company.name);
@@ -415,6 +453,7 @@ export default function ApplicationForm({
 				coverLetter,
 				softSkills,
 				hardSkills,
+				selectedProjects,
 				status,
 			};
 			const json = await api.saveApplication(payload, applicationId);
@@ -1126,6 +1165,22 @@ export default function ApplicationForm({
 					)}
 				</section>
 
+				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-8 sm:mb-12">
+					<FormSectionTitle className="mb-3">
+						6. Le CV - Projets
+					</FormSectionTitle>		
+					<ProjectSelector
+						projects={(cvSample.projects as any[]) || []}
+						selectedProjects={selectedProjects}
+						recommendedProjects={recommendedProjects}
+						onSelectionChange={setSelectedProjects}
+						jobDescription={jobDescription}
+						onGetRecommendations={handleGetProjectRecommendations}
+						loadingRecommendations={loadingRecommendations}
+					/>
+				</section>
+				{/* Projects Selection Section */}
+
 				<section className="bg-white shadow-sm rounded-md p-4 sm:p-6 mb-6">
 					<div className="flex flex-col sm:flex-row gap-3">
 						<Button
@@ -1162,6 +1217,7 @@ export default function ApplicationForm({
 				hardSkills={hardSkills}
 				companyTheme={companyTheme}
 				logoUrl={logoPreviewUrl || resolveLogoUrl(companyLogoUrl)}
+				selectedProjects={selectedProjects}
 			/>
 		</div>
 	);
