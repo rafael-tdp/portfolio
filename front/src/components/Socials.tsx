@@ -29,7 +29,7 @@ const socials = [
 
 export default function Socials() {
   return (
-    <div className="flex flex-row gap-4">
+    <div className="flex flex-row gap-3 md:gap-4">
       {socials.map(({ name, url, icon: Icon }, index) => (
         <motion.a
           key={name}
@@ -40,8 +40,9 @@ export default function Socials() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.2, duration: 0.4 }}
+          className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
-          <Icon className="text-base md:text-2xl hover:text-gray-700 dark:hover:text-gray-300 transition-colors" />
+          <Icon className="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors" />
         </motion.a>
       ))}
     </div>

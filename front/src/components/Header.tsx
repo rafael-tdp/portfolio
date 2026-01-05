@@ -4,10 +4,10 @@ import Menu from "./Menu";
 
 export default function Header() {
   return (
-    <header className="flex flex-col md:h-screen lg:py-24 px-4 sm:px-8 pt-12 md:pt-0">
+    <header className="flex flex-col md:h-screen lg:py-24 px-3 sm:px-4 md:px-8 pt-20 md:pt-0">
       <Hero />
       <Menu />
-      <div className="mt-auto">
+      <div className="mt-6 md:mt-auto mb-4 md:mb-0">
         <Socials />
       </div>
     </header>

@@ -1,5 +1,67 @@
 const projects = [
   {
+    title: "WeMemory",
+    description: "Une application pour partager et conserver ses souvenirs en couple.",
+    image: "/img/projects/couple-app.png",
+    gradient: "from-[#C84A2D] to-[#F5A076]",
+    bgGradient:
+      "linear-gradient(188.62deg, rgba(149, 57, 36, 1) 49.9%, rgb(245, 160, 118) 81.7%, rgb(255, 186, 145) 93.88%, rgb(255, 210, 180) 113.5%)",
+    accentColor: "text-[#FF7F50]",
+    darkAccentColor: "text-[#FFA07A]",
+    shadowColor: "#ffaf9bff",
+    tech: ["nextjs", "tailwind", "adonis", "redux", "gcp", "gcs", "git"],
+    details: [
+      "Plateforme intuitive pour partager les souvenirs du couple en temps réel.",
+      "Organisation des souvenirs en collections thématiques personnalisables.",
+      "Galerie photos partagée avec accès sécurisé pour les deux partenaires.",
+      "Questions interactives pour renforcer la connexion du couple.",
+    ],
+    imageDescription:
+      "Une application moderne pour préserver et célébrer vos plus beaux souvenirs en couple.",
+  },
+  {
+    title: "Wedding Website",
+    description: "Un site web de mariage moderne avec galerie photos et gestion RSVP.",
+    image: "/img/projects/wedding-website.png",
+    href: "https://wedding-website-portfolio.vercel.app/",
+    gradient: "from-[#6B8E71] to-[#A8B896]",
+    bgGradient:
+      "linear-gradient(188.62deg, rgb(85, 107, 89) 49.9%, rgb(147, 170, 140) 81.7%, rgb(168, 184, 150) 93.88%, rgb(196, 207, 186) 113.5%)",
+    accentColor: "text-[#A8B896]",
+    darkAccentColor: "text-[#B8C5A6]",
+    shadowColor: "#b4dabaff",
+    tech: ["nextjs", "tailwind", "supabase", "vercel", "git"],
+    details: [
+      "Interface élégante et responsive pour les mariages modernes.",
+      "Galerie photos interactive avec gestion complète des événements.",
+      "Système de gestion RSVP avec Supabase pour la persistance des données.",
+      "Déployé sur Vercel pour une performance optimale et une scalabilité mondiale.",
+    ],
+    imageDescription:
+      "Un site web complet pour célébrer votre mariage avec style et élégance.",
+  },
+  {
+    title: "LFP Ravalement",
+    description: "Un site vitrine professionnel pour une entreprise de ravalement de façades.",
+    image: "/img/projects/LFP.png",
+    href: "https://lfp-ravalement.fr",
+    gradient: "from-[#7A1C19] to-[#D84038]",
+    bgGradient:
+      "linear-gradient(188.62deg, rgb(122, 28, 25) 49.9%, rgb(216, 64, 56) 81.7%, rgb(231, 105, 93) 93.88%, rgb(244, 147, 137) 113.5%)",
+    accentColor: "text-[#FF7F7F]",
+    darkAccentColor: "text-[#FFA8A8]",
+    shadowColor: "#f63730ff",
+    tech: ["vue", "node", "postgresql", "render", "tailwind", "openai", "git", "docker", "gcs"],
+    details: [
+      "Site vitrine moderne et professionnel pour une entreprise de ravalement.",
+      "Interface responsive optimisée pour tous les appareils.",
+      "Intégration d'IA pour assistance à la génération de devis.",
+      "Backend avec système de gestion de factures client et statistiques.",
+    ],
+    imageDescription:
+      "Découvrez les services de ravalement de façades avec un site professionnel et moderne.",
+  },
+  {
     title: "Pilot",
     description: "Une application de réservation de prestations automobiles.",
     image: "/img/projects/pilot.png",

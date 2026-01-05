@@ -10,8 +10,8 @@ export default function Experiences() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <section id="experience" className="py-12 px-4 sm:px-8 max-w-5xl mx-auto">
-      <SectionTitle># Expériences</SectionTitle>
+    <section id="experience" className="">
+      <SectionTitle>Expériences</SectionTitle>
 
       <div className="flex flex-col gap-6">
         {experiences.map((exp, i) => (

@@ -63,13 +63,13 @@ export default function About() {
   return (
     <motion.section
       id="about"
-      className="py-24 px-4 sm:px-8 max-w-4xl mx-auto"
+      className=""
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
     >
-      <SectionTitle className="block md:hidden"># à props de moi</SectionTitle>
+      <SectionTitle className="block md:hidden" hideBar>À propos de moi</SectionTitle>
 
       <p className="text-sm sm:text-base text-slate-700 dark:text-slate-400 leading-relaxed">
         Bonjour ! Je m&apos;appelle <Strong>Rafael Tavares De Pinho</Strong>, et

@@ -45,7 +45,7 @@ export default function ProjectsSection({
   const textAccentColor = isDarkMode ? darkAccentColor : accentColor;
 
   return (
-    <section id="projects" className="relative w-full py-8 md:py-12">
+    <section id="projects" className="relative w-full">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -17,8 +17,8 @@ export default function Skills() {
     }, {} as Record<string, typeof technologies>);
 
     return (
-        <section id="skills" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto">
-            <SectionTitle># Compétences</SectionTitle>
+        <section id="skills" className="">
+            <SectionTitle>Compétences</SectionTitle>
 
             <div className="mt-12 grid gap-12">
                 {Object.entries(groupedTechnologies).map(([category, techs]) => (

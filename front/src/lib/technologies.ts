@@ -29,6 +29,9 @@ import {
   SiGo,
   SiRender,
   SiGitlab,
+  SiSupabase,
+  SiAdonisjs,
+  SiRedux,
 } from "react-icons/si";
 import { BiLogoVisualStudio } from "react-icons/bi";
 import { TbApi, TbTestPipe, TbCode, TbBrandGitlab } from "react-icons/tb";
@@ -58,12 +61,14 @@ export const technologies: Technology[] = [
   { id: "react", name: "React.js", icon: "SiReact", category: "frontend", color: "#61DAFB" },
   { id: "nextjs", name: "Next.js", icon: "SiNextdotjs", category: "frontend", color: "#000000" },
   { id: "tailwind", name: "Tailwind", icon: "SiTailwindcss", category: "frontend", color: "#06B6D4" },
+  { id: "redux", name: "Redux", icon: "SiRedux", category: "frontend", color: "#764ABC" },
 
   // Backend
   { id: "node", name: "Node.js", icon: "FaNodeJs", category: "backend", color: "#339933" },
   { id: "express", name: "Express.js", icon: "SiExpress", category: "backend", color: "#000000" },
   { id: "nestjs", name: "NestJS", icon: "SiNestjs", category: "backend", color: "#E0234E" },
   { id: "laravel", name: "Laravel", icon: "FaLaravel", category: "backend", color: "#FF2D20" },
+  { id: "adonis", name: "AdonisJS", icon: "SiAdonisjs", category: "backend", color: "#220052" },
   { id: "symfony", name: "Symfony", icon: "SiSymfony", category: "backend", color: "#000000" },
   { id: "apiplatform", name: "API Platform", icon: "TbApi", category: "backend", color: "#38BDF8" },
   { id: "socketio", name: "Socket.IO", icon: "SiSocketdotio", category: "backend", color: "#010101" },
@@ -74,12 +79,14 @@ export const technologies: Technology[] = [
   // Database
   { id: "mongodb", name: "MongoDB", icon: "SiMongodb", category: "database", color: "#47A248" },
   { id: "postgresql", name: "PostgreSQL", icon: "SiPostgresql", category: "database", color: "#336791" },
+  { id: "supabase", name: "Supabase", icon: "SiSupabase", category: "database", color: "#3ECF8E" },
 
   // Cloud
   { id: "vercel", name: "Vercel", icon: "SiVercel", category: "cloud", color: "#000000" },
   { id: "heroku", name: "Heroku", icon: "SiHeroku", category: "cloud", color: "#430098" },
   { id: "render", name: "Render", icon: "SiRender", category: "cloud", color: "#46E3B7" },
-  { id: "googlecloud", name: "GC Storage", icon: "SiGooglecloud", category: "cloud", color: "#4285F4" },
+  { id: "gcp", name: "Google Cloud", icon: "SiGooglecloud", category: "cloud", color: "#4285F4" },
+  { id: "gcs", name: "Cloud Storage", icon: "SiGooglecloud", category: "cloud", color: "#4285F4" },
 
   // Tools
   { id: "git", name: "Git", icon: "SiGit", category: "tools", color: "#F05032" },
@@ -137,6 +144,9 @@ export const iconMap: Record<string, React.ElementType> = {
   SiGo,
   SiRender,
   SiGitlab,
+  SiSupabase,
+  SiAdonisjs,
+  SiRedux,
   BiLogoVisualStudio,
   TbApi,
   TbTestPipe,
