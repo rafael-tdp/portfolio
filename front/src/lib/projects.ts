@@ -1,15 +1,36 @@
 const projects = [
   {
+    title: "Application App",
+    description:
+      "Un outil de création de candidatures personnalisées avec customisation de design.",
+    image: "/img/projects/application-app.png",
+    gradient: "from-blue-700 to-blue-400",
+    bgGradient:
+      "linear-gradient(188.62deg, rgba(12, 38, 80, 1) 49.9%, rgba(83, 132, 210, 1) 81.7%, rgba(174, 205, 255, 1) 93.88%, rgb(147, 197, 253) 113.5%)",
+    accentColor: "text-blue-200",
+    darkAccentColor: "text-blue-300",
+    shadowColor: "#75b1ffff",
+    tech: ["nextjs", "tailwind", "typescript", "node", "adonis", "git", "mongodb", "openai", "vercel", "gcp"],
+    details: [
+      "Outil complet pour créer des candidatures personnalisées assistées par IA.",
+      "Sélection dynamique des projets pour adapter le contenu.",
+      "Génération du PDF et page de partage unique pour chaque candidature.",
+      "Suivi de l'état des candidatures avec statistiques détaillées.",
+    ],
+    imageDescription:
+      "Créez des candidatures uniques et personnalisées en quelques clics.",
+  },
+  {
     title: "WeMemory",
     description: "Une application pour partager et conserver ses souvenirs en couple.",
     image: "/img/projects/couple-app.png",
     gradient: "from-[#C84A2D] to-[#F5A076]",
     bgGradient:
       "linear-gradient(188.62deg, rgba(149, 57, 36, 1) 49.9%, rgb(245, 160, 118) 81.7%, rgb(255, 186, 145) 93.88%, rgb(255, 210, 180) 113.5%)",
-    accentColor: "text-[#FF7F50]",
+    accentColor: "text-[#FFCAB0]",
     darkAccentColor: "text-[#FFA07A]",
     shadowColor: "#ffaf9bff",
-    tech: ["nextjs", "tailwind", "adonis", "redux", "gcp", "gcs", "git"],
+    tech: ["nextjs", "tailwind", "node", "express", "mongodb", "redux", "gcp", "gcs", "git", "vercel"],
     details: [
       "Plateforme intuitive pour partager les souvenirs du couple en temps réel.",
       "Organisation des souvenirs en collections thématiques personnalisables.",
@@ -27,7 +48,7 @@ const projects = [
     gradient: "from-[#6B8E71] to-[#A8B896]",
     bgGradient:
       "linear-gradient(188.62deg, rgb(85, 107, 89) 49.9%, rgb(147, 170, 140) 81.7%, rgb(168, 184, 150) 93.88%, rgb(196, 207, 186) 113.5%)",
-    accentColor: "text-[#A8B896]",
+    accentColor: "text-[#D4E5C4]",
     darkAccentColor: "text-[#B8C5A6]",
     shadowColor: "#b4dabaff",
     tech: ["nextjs", "tailwind", "supabase", "vercel", "git"],
@@ -48,7 +69,7 @@ const projects = [
     gradient: "from-[#7A1C19] to-[#D84038]",
     bgGradient:
       "linear-gradient(188.62deg, rgb(122, 28, 25) 49.9%, rgb(216, 64, 56) 81.7%, rgb(231, 105, 93) 93.88%, rgb(244, 147, 137) 113.5%)",
-    accentColor: "text-[#FF7F7F]",
+    accentColor: "text-[#FFB3B3]",
     darkAccentColor: "text-[#FFA8A8]",
     shadowColor: "#f63730ff",
     tech: ["vue", "node", "postgresql", "render", "tailwind", "openai", "git", "docker", "gcs"],
@@ -68,7 +89,7 @@ const projects = [
     gradient: "from-emerald-900 to-emerald-500",
     bgGradient:
       "linear-gradient(188.62deg, rgb(8, 57, 38) 49.9%, rgb(5, 150, 105) 81.7%, rgb(52, 211, 153) 93.88%, rgb(249, 215, 147) 113.5%)",
-    accentColor: "text-emerald-500",
+    accentColor: "text-emerald-300",
     darkAccentColor: "text-emerald-300",
     shadowColor: "#059669",
     tech: ["react", "tailwind", "apiplatform", "php", "postgresql", "docker", "git"],
@@ -88,7 +109,7 @@ const projects = [
     image: "/img/projects/cuisine-connect.png",
     href: "https://cuisineconnect-1.onrender.com/",
     gradient: "from-rose-700 to-rose-300",
-    accentColor: "text-rose-500",
+    accentColor: "text-rose-300",
     darkAccentColor: "text-rose-300",
     shadowColor: "#DB2777",
     tech: ["react", "tailwind", "node", "express", "docker", "openai", "git"],
@@ -110,7 +131,7 @@ const projects = [
     gradient: "from-indigo-900 to-indigo-300",
     bgGradient:
       "linear-gradient(188.62deg, rgb(9, 0, 81) 49.9%, rgb(96, 59, 246) 81.7%, rgb(107, 172, 252) 93.88%, rgb(142, 229, 255) 113.5%)",
-    accentColor: "text-indigo-500",
+    accentColor: "text-indigo-300",
     darkAccentColor: "text-indigo-300",
     shadowColor: "#A855F7",
     tech: ["react", "tailwind", "node", "express", "socketio", "mongodb", "git"],

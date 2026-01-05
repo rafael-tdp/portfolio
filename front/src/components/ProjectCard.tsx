@@ -26,7 +26,7 @@ export default function ProjectCard({
           <Link
             href={href}
             target="_blank"
-            className="relative cursor-pointer overflow-hidden rounded-xl border border-gray-400/15 bg-slate-950 dark:bg-transparent dark:border-white/15 p-1 shadow-lg md:shadow-2xl h-[250px] md:h-[450px] lg:rounded-3xl lg:p-1.5 group"
+            className="relative cursor-pointer overflow-hidden rounded-xl border border-gray-400/15 bg-slate-950 dark:bg-transparent dark:border-white/15 p-1 shadow-lg md:shadow-2xl h-[250px] md:h-[400px] lg:rounded-3xl lg:p-1.5 group"
           >
             <div
               className="absolute inset-x-0 top-0 h-px"
