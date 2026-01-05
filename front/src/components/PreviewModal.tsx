@@ -18,6 +18,7 @@ interface PreviewModalProps {
   companyTheme: Record<string, string> | null;
   logoUrl?: string | null;
   selectedProjects?: string[];
+  isGeneric?: boolean;
 }
 
 export default function PreviewModal({
@@ -32,6 +33,7 @@ export default function PreviewModal({
   companyTheme,
   logoUrl,
   selectedProjects = [],
+  isGeneric = false,
 }: PreviewModalProps) {
   const [activeTab, setActiveTab] = useState<"cv" | "coverLetter">("cv");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -39,7 +41,14 @@ export default function PreviewModal({
   if (!isOpen) return null;
 
   // Build theme with defaults
-  const theme = {
+  const theme = isGeneric ? {
+    primary: "#0b5ed7",
+    secondary: "#0b5ed7",
+    accent: "#0b5ed7",
+    background: "#0b5ed7",
+    text: "#111827",
+    title: "#fff",
+  } : {
     primary: companyTheme?.primary || "#0b74de",
     secondary: companyTheme?.secondary || companyTheme?.primary || "#0b74de",
     accent: companyTheme?.accent || "#ffffff",
@@ -89,9 +98,9 @@ export default function PreviewModal({
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 bg-gray-50 rounded-t-xl">
           <div className="flex items-center gap-4">
             <h2 className="text-lg font-semibold text-gray-900">
-              Aperçu - {companyName}
+              Aperçu {isGeneric ? "- CV générique" : `- ${companyName}`}
             </h2>
-            <span className="text-sm text-gray-500">{jobTitle}</span>
+            {!isGeneric && <span className="text-sm text-gray-500">{jobTitle}</span>}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -116,29 +125,30 @@ export default function PreviewModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 bg-white">
-          <button
-            onClick={() => setActiveTab("cv")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "cv"
-                ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Mon CV
-          </button>
-          <button
-            onClick={() => setActiveTab("coverLetter")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "coverLetter"
-                ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Lettre de motivation
-          </button>
-        </div>
-
+        {!isGeneric && (
+          <div className="flex border-b border-gray-200 bg-white">
+            <button
+              onClick={() => setActiveTab("cv")}
+              className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                activeTab === "cv"
+                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Mon CV
+            </button>
+            <button
+              onClick={() => setActiveTab("coverLetter")}
+              className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
+                activeTab === "coverLetter"
+                  ? "text-blue-600 border-b-2 border-blue-600 bg-blue-50"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+              >
+                Lettre de motivation
+            </button>
+          </div>
+        )}
         {/* Content */}
         <div className="overflow-auto h-[calc(100%-120px)] p-4 sm:p-6 bg-gray-100">
           {/* Simulated browser header */}
@@ -157,7 +167,7 @@ export default function PreviewModal({
           {/* Preview content */}
           <div className="bg-white rounded-b-lg shadow-sm overflow-hidden">
             {/* Simulated hero */}
-            <div
+            {!isGeneric && (<div
               className="p-6 sm:p-8"
               style={{ background: theme.background }}
             >
@@ -190,7 +200,7 @@ export default function PreviewModal({
                   )}
                 </div>
               </div>
-            </div>
+            </div>)}
 
             {/* Content area */}
             <div className="p-6 sm:p-8">
@@ -231,7 +241,9 @@ export default function PreviewModal({
 
         {/* Footer info */}
         <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-amber-50 border-t border-amber-200 text-amber-800 text-sm text-center rounded-b-xl">
-          💡 Ceci est un aperçu. Le recruteur verra cette page après avoir cliqué sur le lien de partage.
+          {isGeneric 
+            ? "💡 Ceci est votre CV générique. Vous pouvez le télécharger ou le partager."
+            : "💡 Ceci est un aperçu. Le recruteur verra cette page après avoir cliqué sur le lien de partage."}
         </div>
       </div>
     </div>

@@ -63,7 +63,7 @@ function QRCodeContent({ params: rawParams }: { params: Promise<{ id: string }> 
   if (!publicSlug) {
     return (
       <div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <Link
             href="/dashboard/applications"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
@@ -89,7 +89,7 @@ function QRCodeContent({ params: rawParams }: { params: Promise<{ id: string }> 
 
   return (
     <div className="mx-auto px-4 py-4 sm:p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <Link
           href={`/dashboard/applications/${id}/tracking`}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"

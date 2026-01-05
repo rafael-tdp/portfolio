@@ -494,7 +494,7 @@ export default function ApplicationForm({
 
 	return (
 		<div className="mx-auto px-4 sm:p-6 sm:pt-0 bg-gray-50 min-h-screen">
-			<div className="max-w-3xl mx-auto">
+			<div className="max-w-4xl mx-auto">
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
 					<h1 className="text-xl sm:text-2xl font-normal">
 						{applicationId

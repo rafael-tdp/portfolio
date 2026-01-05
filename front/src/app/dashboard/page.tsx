@@ -9,6 +9,8 @@ import RecentActivitySection from "../../components/RecentActivitySection";
 import { LuEye, LuClock, LuLogOut, LuFileText, LuPlus, LuFolderOpen } from "react-icons/lu";
 import { FiTrendingUp } from "react-icons/fi";
 import * as api from "@/lib/api";
+import PreviewModal from "@/components/PreviewModal";
+import cvSample from "@/data/cvSample";
 
 export default function DashboardPage() {
 	return (
@@ -73,6 +75,7 @@ function DashboardContent() {
 	const [loadingStats, setLoadingStats] = React.useState(true);
 	const [applicationCount, setApplicationCount] = React.useState(0);
 	const [loggingOut, setLoggingOut] = React.useState(false);
+	const [showGenericCV, setShowGenericCV] = React.useState(false);
 
 	React.useEffect(() => {
 		const t =
@@ -143,7 +146,7 @@ function DashboardContent() {
 	}
 
 	return (
-		<div className="min-h-screen px-4 py-4 sm:p-6 bg-gray-50">
+		<div className="min-h-screen px-4 py-4 sm:pt-12 sm:p-6 bg-gray-50">
 			<div className="max-w-4xl mx-auto">
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
 					<h1 className="text-xl sm:text-2xl font-semibold">
@@ -212,7 +215,22 @@ function DashboardContent() {
 						<div className="font-semibold text-gray-800">Nouvelle candidature</div>
 					</div>
 					<div className="text-xs sm:text-sm text-gray-500">
-						Ciblée ou spontanée
+						Créez une candidature ciblée ou spontanée
+					</div>
+				</Link>
+
+				<Link
+					href="/dashboard/cv-creator"
+					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all group col-span-1 sm:col-span-2"
+				>
+					<div className="flex items-center gap-3 mb-2">
+						<div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
+							<LuFileText className="w-5 h-5 text-indigo-600" />
+						</div>
+						<div className="font-semibold text-gray-800">Créateur de CV</div>
+					</div>
+					<div className="text-xs sm:text-sm text-gray-500">
+						Personnalisez votre CV
 					</div>
 				</Link>
 			</div>				{/* Quick stats */}
@@ -431,6 +449,22 @@ function DashboardContent() {
 						</div>
 					)}
 			</div>
+
+			{/* Generic CV Modal */}
+			<PreviewModal
+				isOpen={showGenericCV}
+				onClose={() => setShowGenericCV(false)}
+				companyName="CV Générique"
+				jobTitle="Développeur"
+				jobDescription=""
+				coverLetter=""
+				softSkills={cvSample.softSkills || []}
+				hardSkills={cvSample.skills || {}}
+				companyTheme={null}
+				logoUrl={null}
+				selectedProjects={cvSample.projects?.map((p: any) => p.name) || []}
+				isGeneric={true}
+			/>
 		</div>
 	);
 }

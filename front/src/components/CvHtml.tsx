@@ -313,7 +313,7 @@ export default function CvHtml({
 					className="w-[30rem] pt-[13rem] text-black pb-8"
 					style={{
 						backgroundColor: getLighterColor(
-							theme?.background,
+							theme?.primary,
 							0.85
 						),
 					}}
@@ -358,7 +358,7 @@ export default function CvHtml({
 									value={d.contact?.website || ""}
 									href={d.contact?.website}
 									className="font-semibold"
-									style={{ color: theme?.background }}
+									style={{ color: theme?.primary }}
 								/>
 							</div>
 						</div>
