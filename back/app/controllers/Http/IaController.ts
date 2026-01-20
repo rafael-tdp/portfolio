@@ -11,9 +11,168 @@ import User from '../../mongodb/models/user.js'
 import Company from '../../mongodb/models/company.js'
 
 const GOOGLE_API_KEY = env.get('GOOGLE_API_KEY') || env.get('GOOGLE_KEY')
-const GOOGLE_MODEL = env.get('GOOGLE_MODEL') || 'gemini-2.5-flash'
+const DEFAULT_GOOGLE_MODEL = 'gemini-2.5-flash'
+
+// Fallback free models if API detection fails
+const FALLBACK_FREE_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+]
+
+// Store currently selected model in memory (in production, use a database)
+let CURRENT_GOOGLE_MODEL = env.get('GOOGLE_MODEL') || DEFAULT_GOOGLE_MODEL
+let AVAILABLE_MODELS: string[] = []
+let MODELS_LAST_FETCHED = 0
 
 export default class IaController {
+  /**
+   * Check if a model is free tier based on API response
+   */
+  private static isFreeTierModel(model: any): boolean {
+    // A model is free if:
+    // 1. It has no inputTokenCostPerMillionTokens AND no outputTokenCostPerMillionTokens (both 0 or missing)
+    // 2. OR it has very low costs (some models might charge minimal amounts)
+    const inputCost = model.inputTokenCostPerMillionTokens || 0
+    const outputCost = model.outputTokenCostPerMillionTokens || 0
+    
+    // Free tier models should have 0 cost
+    return inputCost === 0 && outputCost === 0
+  }
+
+  /**
+   * Fetch available models from Google Gemini API
+   * Automatically detects FREE models based on pricing info
+   */
+  private static async fetchAvailableModels(): Promise<string[]> {
+    // Cache for 1 hour (3600000 ms)
+    if (AVAILABLE_MODELS.length > 0 && Date.now() - MODELS_LAST_FETCHED < 3600000) {
+      return AVAILABLE_MODELS
+    }
+
+    try {
+      const fetcher = await getFetch()
+      const url = `https://generativelanguage.googleapis.com/v1/models?key=${GOOGLE_API_KEY}`
+      const res: any = await fetcher(url)
+      
+      if (!res.ok) {
+        console.warn('Failed to fetch models from Google API, using fallback free models')
+        return FALLBACK_FREE_MODELS
+      }
+
+      const data = await res.json()
+      const models = data.models || []
+      
+      // Filter for:
+      // 1. Models that support generateContent
+      // 2. NOT tuned models
+      // 3. FREE models only (based on pricing from API)
+      const availableModels = models
+        .filter((m: any) => {
+          const name = m.name || ''
+          // Exclude tuned models
+          const isTuned = name.includes('tuned')
+          // Include models that support generateContent
+          const supportsGenerateContent = m.supportedGenerationMethods?.includes('generateContent')
+          // Check if it's free tier
+          const isFree = IaController.isFreeTierModel(m)
+          
+          return supportsGenerateContent && !isTuned && isFree
+        })
+        .map((m: any) => m.name.replace('models/', ''))
+        .sort()
+
+      AVAILABLE_MODELS = availableModels.length > 0 ? availableModels : FALLBACK_FREE_MODELS
+      MODELS_LAST_FETCHED = Date.now()
+      console.log('Available FREE models from Google API:', AVAILABLE_MODELS)
+      return AVAILABLE_MODELS
+    } catch (err) {
+      console.error('Error fetching models from Google API:', err)
+      // Fallback to free models only
+      return FALLBACK_FREE_MODELS
+    }
+  }
+  /**
+   * Get available Gemini models
+   * GET /api/ia/models
+   */
+  public async getModels({ response }: HttpContextContract) {
+    const availableModels = await IaController.fetchAvailableModels()
+    return response.ok({
+      available: availableModels,
+      current: CURRENT_GOOGLE_MODEL,
+    })
+  }
+
+  /**
+   * Check if an error is due to quota limit exceeded
+   */
+  private static isQuotaError(err: any): boolean {
+    if (!err) return false
+    
+    // Check error message
+    const message = err.message?.toLowerCase() || ''
+    const errorString = JSON.stringify(err).toLowerCase()
+    
+    return (
+      message.includes('quota') ||
+      message.includes('rate_limit_exceeded') ||
+      message.includes('429') ||
+      errorString.includes('resource_exhausted') ||
+      errorString.includes('quota') ||
+      err.status === 429 ||
+      err.code === 'RESOURCE_EXHAUSTED'
+    )
+  }
+
+  /**
+   * Handle API errors and return appropriate response
+   */
+  private static handleApiError(err: any, context: string = '') {
+    const isQuota = IaController.isQuotaError(err)
+    
+    if (isQuota) {
+      console.error(`[${context}] Quota exceeded:`, err.message)
+      return {
+        error: 'Quota API Gemini dépassé',
+        detail: 'Vous avez atteint la limite d\'utilisation de l\'API Gemini. Essayez à nouveau demain ou vérifiez votre compte Google Cloud.',
+        quotaExceeded: true,
+      }
+    }
+    
+    console.error(`[${context}] API error:`, err)
+    return {
+      error: 'Erreur lors de la génération',
+      detail: err.message || 'Une erreur est survenue',
+      quotaExceeded: false,
+    }
+  }
+
+  /**
+   * Set the current Gemini model
+   * POST /api/ia/models
+   * Body: { model: string }
+   */
+  public async setModel({ request, response }: HttpContextContract) {
+    const { model } = request.all()
+    const availableModels = await IaController.fetchAvailableModels()
+    
+    if (!model || !availableModels.includes(model)) {
+      return response.badRequest({
+        error: `Invalid model. Available models: ${availableModels.join(', ')}`,
+      })
+    }
+
+    CURRENT_GOOGLE_MODEL = model
+    return response.ok({
+      message: 'Model changed successfully',
+      current: CURRENT_GOOGLE_MODEL,
+    })
+  }
+
+  private getGoogleModel(): string {
+    return CURRENT_GOOGLE_MODEL
+  }
   public async generateCover({ request, response }: HttpContextContract) {
     const {
       userId,
@@ -155,7 +314,7 @@ export default class IaController {
         const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY })
         // `generateContent` accepts `model` and `contents` per the SDK examples
         const sdkResp: any = await ai.models.generateContent({
-          model: GOOGLE_MODEL,
+          model: this.getGoogleModel(),
           contents: prompt,
         })
         content = sdkResp?.text || sdkResp?.output?.[0]?.content || JSON.stringify(sdkResp)
@@ -165,7 +324,7 @@ export default class IaController {
         // Minimal HTTP fallback (single attempt). This is less robust than
         // the SDK but helps when the package isn't installed.
         const fetcher = await getFetch()
-        const url = `https://generativelanguage.googleapis.com/v1/models/${GOOGLE_MODEL}:generate?key=${GOOGLE_API_KEY}`
+        const url = `https://generativelanguage.googleapis.com/v1/models/${this.getGoogleModel()}:generate?key=${GOOGLE_API_KEY}`
         let r: any = null
         try {
           r = await fetcher(url, {
@@ -202,7 +361,7 @@ export default class IaController {
         if (applicationId) {
           const application = await Application.findByIdAndUpdate(
             applicationId,
-            { coverLetter: content, coverLetterMeta: { model: GOOGLE_MODEL, prompt } },
+            { coverLetter: content, coverLetterMeta: { model: this.getGoogleModel(), prompt } },
             { new: true }
           )
           return response.ok({ application, coverLetter: content, generated: true })
@@ -213,15 +372,19 @@ export default class IaController {
           jobTitle,
           jobDescription,
           coverLetter: content,
-          coverLetterMeta: { model: GOOGLE_MODEL, prompt },
+          coverLetterMeta: { model: this.getGoogleModel(), prompt },
           status: 'draft',
         } as any)
         return response.ok({ application, coverLetter: content, generated: true })
       }
       return response.ok({ coverLetter: content, generated: true })
     } catch (err) {
+      const errorInfo = IaController.handleApiError(err, 'generateCover')
+      if (errorInfo.quotaExceeded) {
+        return response.status(429).send(errorInfo)
+      }
       console.error('IA generation error', err)
-      return response.internalServerError({ error: 'Generation failed' })
+      return response.internalServerError(errorInfo)
     }
   }
 
@@ -271,7 +434,7 @@ Retourne uniquement le tableau JSON, rien d'autre.`
         const GoogleGenAI = (mod as any).GoogleGenAI || (mod as any).default || mod
         const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY })
         const sdkResp: any = await ai.models.generateContent({
-          model: GOOGLE_MODEL,
+          model: this.getGoogleModel(),
           contents: prompt,
         })
         content = sdkResp?.text || sdkResp?.output?.[0]?.content || JSON.stringify(sdkResp)
@@ -280,7 +443,7 @@ Retourne uniquement le tableau JSON, rien d'autre.`
         
         // HTTP fallback
         const fetcher = await getFetch()
-        const url = `https://generativelanguage.googleapis.com/v1/models/${GOOGLE_MODEL}:generate?key=${GOOGLE_API_KEY}`
+        const url = `https://generativelanguage.googleapis.com/v1/models/${this.getGoogleModel()}:generate?key=${GOOGLE_API_KEY}`
         const r: any = await fetcher(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -405,7 +568,7 @@ Retourne UNIQUEMENT l'objet JSON, sans texte avant ou après.`
         const GoogleGenAI = (mod as any).GoogleGenAI || (mod as any).default || mod
         const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY })
         const sdkResp: any = await ai.models.generateContent({
-          model: GOOGLE_MODEL,
+          model: this.getGoogleModel(),
           contents: prompt,
         })
         content = sdkResp?.text || sdkResp?.output?.[0]?.content || JSON.stringify(sdkResp)
@@ -414,7 +577,7 @@ Retourne UNIQUEMENT l'objet JSON, sans texte avant ou après.`
         
         // HTTP fallback
         const fetcher = await getFetch()
-        const url = `https://generativelanguage.googleapis.com/v1/models/${GOOGLE_MODEL}:generate?key=${GOOGLE_API_KEY}`
+        const url = `https://generativelanguage.googleapis.com/v1/models/${this.getGoogleModel()}:generate?key=${GOOGLE_API_KEY}`
         const r: any = await fetcher(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -524,7 +687,7 @@ Recommandez entre 2 et 4 projets les plus pertinents basés sur les compétences
         const GoogleGenAI = (mod as any).GoogleGenAI || (mod as any).default || mod
         const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY })
         const sdkResp: any = await ai.models.generateContent({
-          model: GOOGLE_MODEL,
+          model: this.getGoogleModel(),
           contents: prompt,
         })
         content = sdkResp?.text || sdkResp?.output?.[0]?.content || JSON.stringify(sdkResp)
@@ -533,7 +696,7 @@ Recommandez entre 2 et 4 projets les plus pertinents basés sur les compétences
 
         // Fallback to HTTP call
         const fetcher = await getFetch()
-        const url = `https://generativelanguage.googleapis.com/v1/models/${GOOGLE_MODEL}:generate?key=${GOOGLE_API_KEY}`
+        const url = `https://generativelanguage.googleapis.com/v1/models/${this.getGoogleModel()}:generate?key=${GOOGLE_API_KEY}`
         const r: any = await fetcher(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

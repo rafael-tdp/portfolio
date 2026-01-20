@@ -463,3 +463,26 @@ export async function serverGenerateSoftSkills(jobTitle: string, jobDescription:
   if (!res.ok) return null;
   return res.json();
 }
+
+// ============ GEMINI MODELS ============
+
+export async function getAvailableModels() {
+  const res = await fetch(`${API_BASE}/api/ia/models`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function setGeminiModel(model: string) {
+  const token = getToken();
+  if (!token) return null;
+  const res = await fetch(`${API_BASE}/api/ia/models`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ model }),
+  });
+  if (!res.ok) return null;
+  return res.json();
+}

@@ -200,6 +200,8 @@ router.post('/api/ia/generate-cover', handler('#controllers/Http/IaController.js
 router.post('/api/ia/generate-soft-skills', handler('#controllers/Http/IaController.js', 'generateSoftSkills')) // Public - only generates generic soft skills
 router.post('/api/ia/generate-hard-skills', handler('#controllers/Http/IaController.js', 'generateHardSkills')) // Public - filters from known skills only
 router.post('/api/ia/recommend-projects', handler('#controllers/Http/IaController.js', 'recommendProjects', { auth: true }))
+router.get('/api/ia/models', handler('#controllers/Http/IaController.js', 'getModels'))
+router.post('/api/ia/models', handler('#controllers/Http/IaController.js', 'setModel', { auth: true }))
 
 // Public view
 router.get('/public/:slug', handler('#controllers/Http/PublicController.js', 'showCompany'))

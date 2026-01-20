@@ -6,7 +6,15 @@ import { toast } from "sonner";
 import AuthGuard from "../../components/AuthGuard";
 import Button from "../../components/Button";
 import RecentActivitySection from "../../components/RecentActivitySection";
-import { LuEye, LuClock, LuLogOut, LuFileText, LuPlus, LuFolderOpen } from "react-icons/lu";
+import {
+	LuEye,
+	LuClock,
+	LuLogOut,
+	LuFileText,
+	LuPlus,
+	LuFolderOpen,
+	LuSettings,
+} from "react-icons/lu";
 import { FiTrendingUp } from "react-icons/fi";
 import * as api from "@/lib/api";
 import PreviewModal from "@/components/PreviewModal";
@@ -26,7 +34,11 @@ type VisitStats = {
 	avgVisitsPerDay?: number;
 	avgTimeSpent?: number;
 	avgScrollDepth?: number;
-	visitsByDay?: Array<{ date: string; count: number; uniqueVisitors: number }>;
+	visitsByDay?: Array<{
+		date: string;
+		count: number;
+		uniqueVisitors: number;
+	}>;
 	visitsByHour?: Array<{ hour: number; count: number }>;
 	deviceStats?: Array<{ device: string; count: number }>;
 	browserStats?: Array<{ browser: string; count: number }>;
@@ -167,13 +179,22 @@ function DashboardContent() {
 										</div>
 									)}
 								</div>
-								<Button
-									onClick={logout}
-									loading={loggingOut}
-									className="px-3 py-1 text-sm bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 flex-shrink-0"
-								>
-									<LuLogOut className="w-4 h-4" />
-								</Button>
+								<div className="flex items-center gap-2">
+									<Link
+										href="/dashboard/settings"
+										className="h-9 px-3 text-sm bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 rounded-md transition-colors flex items-center justify-center flex-shrink-0"
+										title="Paramètres"
+									>
+										<LuSettings className="w-4 h-4" />
+									</Link>
+									<Button
+										onClick={logout}
+										loading={loggingOut}
+										className="h-9 px-3 text-sm bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 flex-shrink-0"
+									>
+										<LuLogOut className="w-4 h-4" />
+									</Button>
+								</div>
 							</div>
 						) : (
 							<div className="flex items-center gap-3">
@@ -187,53 +208,59 @@ function DashboardContent() {
 						)}
 					</div>
 				</div>
-
-			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-				<Link
-					href="/dashboard/applications"
-					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all group"
-				>
-					<div className="flex items-center gap-3 mb-2">
-						<div className="w-10 h-10 rounded-lg bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
-							<LuFolderOpen className="w-5 h-5 text-sky-600" />
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+					<Link
+						href="/dashboard/applications"
+						className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all group"
+					>
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 rounded-lg bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">
+								<LuFolderOpen className="w-5 h-5 text-sky-600" />
+							</div>
+							<div className="font-semibold text-gray-800">
+								Mes candidatures
+							</div>
 						</div>
-						<div className="font-semibold text-gray-800">Mes candidatures</div>
-					</div>
-					<div className="text-xs sm:text-sm text-gray-500">
-						Voir et gérer vos candidatures
-					</div>
-				</Link>
-
-				<Link
-					href="/dashboard/create"
-					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all group"
-				>
-					<div className="flex items-center gap-3 mb-2">
-						<div className="w-10 h-10 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
-							<LuPlus className="w-5 h-5 text-emerald-600" />
+						<div className="text-xs sm:text-sm text-gray-500">
+							Voir et gérer vos candidatures
 						</div>
-						<div className="font-semibold text-gray-800">Nouvelle candidature</div>
-					</div>
-					<div className="text-xs sm:text-sm text-gray-500">
-						Créez une candidature ciblée ou spontanée
-					</div>
-				</Link>
+					</Link>
 
-				<Link
-					href="/dashboard/cv-creator"
-					className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all group col-span-1 sm:col-span-2"
-				>
-					<div className="flex items-center gap-3 mb-2">
-						<div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
-							<LuFileText className="w-5 h-5 text-indigo-600" />
+					<Link
+						href="/dashboard/create"
+						className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all group"
+					>
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+								<LuPlus className="w-5 h-5 text-emerald-600" />
+							</div>
+							<div className="font-semibold text-gray-800">
+								Nouvelle candidature
+							</div>
 						</div>
-						<div className="font-semibold text-gray-800">Créateur de CV</div>
-					</div>
-					<div className="text-xs sm:text-sm text-gray-500">
-						Personnalisez votre CV
-					</div>
-				</Link>
-			</div>				{/* Quick stats */}
+						<div className="text-xs sm:text-sm text-gray-500">
+							Créez une candidature ciblée ou spontanée
+						</div>
+					</Link>
+
+					<Link
+						href="/dashboard/cv-creator"
+						className="block p-4 sm:p-5 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all group col-span-1 sm:col-span-2"
+					>
+						<div className="flex items-center gap-3 mb-2">
+							<div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
+								<LuFileText className="w-5 h-5 text-indigo-600" />
+							</div>
+							<div className="font-semibold text-gray-800">
+								Créateur de CV
+							</div>
+						</div>
+						<div className="text-xs sm:text-sm text-gray-500">
+							Personnalisez votre CV
+						</div>
+					</Link>
+				</div>{" "}
+				{/* Quick stats */}
 				{!loadingStats && visitStats && (
 					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
 						<div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
@@ -268,10 +295,12 @@ function DashboardContent() {
 							</div>
 							<div>
 								<div className="text-xs sm:text-sm font-semibold text-gray-800">
-									{visitStats.recentActivity && visitStats.recentActivity.length > 0
+									{visitStats.recentActivity &&
+									visitStats.recentActivity.length > 0
 										? formatDate(
-												visitStats.recentActivity[0].createdAt
-										  ).replace(",", " à ")
+												visitStats.recentActivity[0]
+													.createdAt,
+											).replace(",", " à ")
 										: "—"}
 								</div>
 								<div className="text-xs sm:text-sm text-gray-400">
@@ -281,7 +310,6 @@ function DashboardContent() {
 						</div>
 					</div>
 				)}
-
 				{/* Analytics link */}
 				{!loadingStats && visitStats && visitStats.totalVisits > 0 && (
 					<Link
@@ -307,7 +335,6 @@ function DashboardContent() {
 						</div>
 					</Link>
 				)}
-
 				{/* Recent activity */}
 				{!loadingStats &&
 					visitStats &&
@@ -320,11 +347,11 @@ function DashboardContent() {
 							/>
 						</div>
 					)}
-
 				{/* Old Recent visits - shown only if recentActivity is not available */}
 				{!loadingStats &&
 					visitStats &&
-					(!visitStats.recentActivity || visitStats.recentActivity.length === 0) &&
+					(!visitStats.recentActivity ||
+						visitStats.recentActivity.length === 0) &&
 					visitStats.visits &&
 					visitStats.visits.length > 0 && (
 						<div className="bg-white rounded-xl border border-gray-100 mb-6 overflow-hidden">
@@ -341,17 +368,21 @@ function DashboardContent() {
 											key={v._id}
 											className={`px-4 sm:px-5 py-2 flex items-center justify-between hover:bg-gray-50/50 transition-colors ${
 												index !==
-												(visitStats.visits?.slice(0, 20) || [])
-													.length -
+												(
+													visitStats.visits?.slice(
+														0,
+														20,
+													) || []
+												).length -
 													1
 													? "border-b border-gray-50"
 													: ""
 											}`}
 										>
 											<div className="flex items-center gap-3 sm:gap-4 min-w-0">
-											<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-sm sm:text-base shadow-sm flex-shrink-0">
-												💻
-											</div>
+												<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-sm sm:text-base shadow-sm flex-shrink-0">
+													💻
+												</div>
 												<div className="min-w-0">
 													<div className="text-xs sm:text-sm font-medium text-gray-800 truncate">
 														{v.company?.name ||
@@ -374,7 +405,6 @@ function DashboardContent() {
 							</div>
 						</div>
 					)}
-
 				{/* Stats per application */}
 				{!loadingStats &&
 					visitStats &&
@@ -387,52 +417,56 @@ function DashboardContent() {
 								</h2>
 							</div>
 							<div className="max-h-60 overflow-y-auto">
-								{(visitStats.applications || []).map((app, index) => (
-									<div
-										key={app.applicationId}
-										className={`px-4 sm:px-5 py-2 flex items-center justify-between hover:bg-gray-50/50 transition-colors ${
-											index !==
-											(visitStats.applications?.length || 1) - 1
-												? "border-b border-gray-50"
-												: ""
-										}`}
-									>
-										<div className="flex-1 min-w-0">
-											<div className="font-medium text-gray-800 truncate text-xs sm:text-sm">
-												{app.jobTitle || "Sans titre"}
+								{(visitStats.applications || []).map(
+									(app, index) => (
+										<div
+											key={app.applicationId}
+											className={`px-4 sm:px-5 py-2 flex items-center justify-between hover:bg-gray-50/50 transition-colors ${
+												index !==
+												(visitStats.applications
+													?.length || 1) -
+													1
+													? "border-b border-gray-50"
+													: ""
+											}`}
+										>
+											<div className="flex-1 min-w-0">
+												<div className="font-medium text-gray-800 truncate text-xs sm:text-sm">
+													{app.jobTitle ||
+														"Sans titre"}
+												</div>
+												<div className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">
+													{app.lastVisit
+														? `Dernière visite : ${formatDate(
+																app.lastVisit,
+															)}`
+														: "Aucune visite"}
+												</div>
 											</div>
-											<div className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">
-												{app.lastVisit
-													? `Dernière visite : ${formatDate(
-															app.lastVisit
-													  )}`
-													: "Aucune visite"}
+											<div className="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 flex-shrink-0">
+												<div className="flex flex-col items-center px-2 sm:px-3 py-1 sm:py-1.5 bg-sky-50 rounded-lg min-w-[45px] sm:min-w-[60px]">
+													<div className="text-xs sm:text-sm font-bold text-sky-600">
+														{app.totalVisits}
+													</div>
+													<div className="text-[6px] sm:text-[7px] uppercase tracking-wide text-sky-400 font-medium">
+														visites
+													</div>
+												</div>
+												<div className="flex flex-col items-center px-1 sm:px-1 py-1 bg-emerald-50 rounded-lg min-w-[45px] sm:min-w-[60px]">
+													<div className="text-xs sm:text-sm font-bold text-emerald-600">
+														{app.uniqueVisitors}
+													</div>
+													<div className="text-[6px] sm:text-[7px] uppercase tracking-wide text-emerald-400 font-medium">
+														uniques
+													</div>
+												</div>
 											</div>
 										</div>
-										<div className="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 flex-shrink-0">
-											<div className="flex flex-col items-center px-2 sm:px-3 py-1 sm:py-1.5 bg-sky-50 rounded-lg min-w-[45px] sm:min-w-[60px]">
-												<div className="text-xs sm:text-sm font-bold text-sky-600">
-													{app.totalVisits}
-												</div>
-												<div className="text-[6px] sm:text-[7px] uppercase tracking-wide text-sky-400 font-medium">
-													visites
-												</div>
-											</div>
-											<div className="flex flex-col items-center px-1 sm:px-1 py-1 bg-emerald-50 rounded-lg min-w-[45px] sm:min-w-[60px]">
-												<div className="text-xs sm:text-sm font-bold text-emerald-600">
-													{app.uniqueVisitors}
-												</div>
-												<div className="text-[6px] sm:text-[7px] uppercase tracking-wide text-emerald-400 font-medium">
-													uniques
-												</div>
-											</div>
-										</div>
-									</div>
-								))}
+									),
+								)}
 							</div>
 						</div>
 					)}
-
 				{!loadingStats &&
 					(!visitStats || visitStats.totalVisits === 0) && (
 						<div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8 mb-6 text-center">
@@ -462,7 +496,9 @@ function DashboardContent() {
 				hardSkills={cvSample.skills || {}}
 				companyTheme={null}
 				logoUrl={null}
-				selectedProjects={cvSample.projects?.map((p: any) => p.name) || []}
+				selectedProjects={
+					cvSample.projects?.map((p: any) => p.name) || []
+				}
 				isGeneric={true}
 			/>
 		</div>

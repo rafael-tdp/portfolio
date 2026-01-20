@@ -412,13 +412,23 @@ export default function ApplicationForm({
 				saveApplication: false,
 			});
 			
+			if ((coverJson as any).quotaExceeded) {
+				toast.error("Quota API Gemini dépassé. Essayez demain ou changez de compte Google Cloud.");
+				return;
+			}
+			
 			setCoverLetter(coverJson.coverLetter || "");
 			const message = jobDescription 
 				? "Lettre de motivation générée - vérifiez et enregistrez"
 				: "Candidature spontanée générée - vérifiez et enregistrez";
 			toast.success(message);
 		} catch (err) {
-			toast.error((err as Error).message || String(err));
+			const errorMsg = (err as any).message || String(err);
+			if (errorMsg.includes('429') || errorMsg.includes('quota')) {
+				toast.error("Quota API Gemini dépassé. Essayez demain ou changez de compte.");
+			} else {
+				toast.error(errorMsg);
+			}
 		} finally {
 			setLoading(false);
 		}
