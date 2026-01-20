@@ -428,16 +428,15 @@ export default class VisitsController {
       }
     ])
 
-    // Recent activity (visits grouped by day with details)
+    // Recent activity (all visits, sorted by date)
     const recentActivity = await Visit.aggregate([
       { 
         $match: { 
-          application: { $in: appIds },
-          createdAt: { $gte: thirtyDaysAgo }
+          application: { $in: appIds }
         } 
       },
       { $sort: { createdAt: -1 } },
-      { $limit: 50 },
+      { $limit: 100 },
       {
         $lookup: {
           from: 'companies',
