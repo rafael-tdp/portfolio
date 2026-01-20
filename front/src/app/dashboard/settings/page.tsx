@@ -24,7 +24,7 @@ export default function SettingsPage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-lg font-semibold mb-4 text-gray-800">
-                Modèle d'IA
+                Modèle d&apos;IA
               </h2>
               <ModelSelector />
             </div>
